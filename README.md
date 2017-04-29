@@ -75,7 +75,7 @@ You will need to create a Key Vault to store your SSH Private Key that will then
 
 ## Deploy Template
 
-Once you have collected all of the prerequisites for the template, you can deploy the template by populating the *azuredeploy.parameters.json* file and executing Resource Manager deployment commands with PowerShell or the CLI.
+Once you have collected all of the prerequisites for the template, you can deploy the template by populating the *azuredeploy.parameters.local.json* file and executing Resource Manager deployment commands with PowerShell or the CLI.
 
 For Azure CLI 2.0, sample commands:
 
