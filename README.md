@@ -52,7 +52,7 @@ You will need to create a Key Vault to store your SSH Private Key that will then
 
 ### azuredeploy.Parameters.json File Explained
 
-1.  _artifactsLocation: The base URL where artifacts required by this template are located
+1.  _artifactsLocation: The base URL where artifacts required by this template are located. If you are using your own fork of the repo and want the deployment to pick up artifacts from your fork, update this value appropriately (user and branch), for example, change from `https://raw.githubusercontent.com/Microsoft/openshift-origin/master/` to `https://raw.githubusercontent.com/YourUser/openshift-origin/YourBranch/`
 2.  masterVmSize: Select from one of the allowed VM sizes listed in the azuredeploy.json file
 3.  nodeVmSize: Select from one of the allowed VM sizes listed in the azuredeploy.json file
 4.  osImage: Select from CentOS or RHEL for the Operating System
