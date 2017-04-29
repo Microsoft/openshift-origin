@@ -75,7 +75,29 @@ You will need to create a Key Vault to store your SSH Private Key that will then
 
 ## Deploy Template
 
-Once you have collected all of the prerequisites for the template, you can deploy the template by populating the *azuredeploy.parameters.json* file and executing Resource Manager deployment commands with PowerShell or the xplat CLI.
+Once you have collected all of the prerequisites for the template, you can deploy the template by populating the *azuredeploy.parameters.json* file and executing Resource Manager deployment commands with PowerShell or the CLI.
+
+For Azure CLI 2.0, sample commands:
+
+```bash
+az group create --name OpenShiftTestRG --location WestUS2
+```
+while in the folder where your local fork resides
+
+```bash
+az group deployment create --resource-group OpenShiftTestRG --template-file azuredeploy.json --parameters @azuredeploy.parameters.local.json --no-wait
+```
+
+Monitor deployment via CLI or Portal and get the console URL from outputs of successful deployment which will look something like (if using sample parameters file and "West US 2" location):
+
+`https://me-master1.westus2.cloudapp.azure.com:8443/console`
+
+The cluster will use self-signed certificates. Accept the warning and proceed to the login page.
+
+### NOTE
+
+Ensure combination of openshiftMasterPublicIpDnsLabelPrefix, and nodeLbPublicIpDnsLabelPrefix parameters, combined with the deployment location give you globally unique URL for the cluster or deployment will fail at the step of allocating public IPs with fully-qualified-domain-names as above.
+
 
 ### NOTE
 
