@@ -1,0 +1,60 @@
+﻿{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"_artifactsLocation": {
+			"value": "https://raw.githubusercontent.com/Microsoft/openshift-origin/master/"
+		},
+		"masterVmSize": {
+			"value": "Standard_DS3_v2"
+		},
+		"nodeVmSize": {
+			"value": "Standard_DS3_v2"
+		},
+		"osImage": {
+			"value": "centos"
+		},
+		"openshiftMasterHostname": {
+			"value": "master"
+		},
+		"openshiftMasterPublicIpDnsLabelPrefix": {
+			"value": "me-master1"
+		},
+		"nodeLbPublicIpDnsLabelPrefix": {
+			"value": "me-node1"
+		},
+		"nodePrefix": {
+			"value": "node"
+		},
+		"nodeInstanceCount": {
+			"value": 2
+		},
+		"adminUsername": {
+			"value": "azureuser"
+		},
+		"adminPassword": {
+			"value": "ThisIsYourSampleSecret!ShouldStayLocal!"
+		},
+		"sshPublicKey": {
+			"value": "ssh-rsa AAAAB3...Public...Key...You...Created...In...Prep...Steps...swXg5szN"
+		},
+		"subscriptionId": {
+			"value": "d1230000-0000-0000-0000-000000000000"
+		},
+		"keyVaultResourceGroup": {
+			"value": "OpenShiftRG1"
+		},
+		"keyVaultName": {
+			"value": "OpenShiftKV"
+		},
+		"keyVaultSecret": {
+			"value": "OpenShiftPK1"
+		},
+		"defaultSubDomainType": {
+			"value": "xipio"
+		},
+		"defaultSubDomain": {
+			"value": "domain-name-all-lowercase-if-custom-used.com"
+		}
+	}
+}
