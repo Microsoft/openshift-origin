@@ -38,9 +38,6 @@
 		"sshPublicKey": {
 			"value": "ssh-rsa AAAAB3...Public...Key...You...Created...In...Prep...Steps...swXg5szN"
 		},
-		"subscriptionId": {
-			"value": "d1230000-0000-0000-0000-000000000000"
-		},
 		"keyVaultResourceGroup": {
 			"value": "OpenShiftRG1"
 		},
