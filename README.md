@@ -40,15 +40,23 @@ You will need to create a Key Vault to store your SSH Private Key that will then
   d.  Create Secret: Set-AzureKeyVaultSecret -Name 'SecretName' -SecretValue $securesecret -VaultName 'KeyVaultName'<br/>
   e.  Enable the Key Vault for Template Deployments: Set-AzureRmKeyVaultAccessPolicy -VaultName 'KeyVaultName' -ResourceGroupName 'ResourceGroupName' -EnabledForTemplateDeployment
 
-2. Create Key Vault using Azure CLI - must be run from a Linux machine (can use Azure CLI container from Docker for Windows) or Mac<br/>
-  a.  Create new Resource Group: azure group create \<name\> \<location\> <br/>
-         Ex: [azure group create ResourceGroupName 'East US'] <br/>
+2. **Create Key Vault using Azure CLI 1.0**<br/>
+  a.  Create new Resource Group: azure group create \<name\> \<location\><br/>
+         Ex: `azure group create ResourceGroupName 'East US'`<br/>
   b.  Create Key Vault: azure keyvault create -u \<vault-name\> -g \<resource-group\> -l \<location\><br/>
-         Ex: [azure keyvault create -u KeyVaultName -g ResourceGroupName -l 'East US'] <br/>
+         Ex: `azure keyvault create -u KeyVaultName -g ResourceGroupName -l 'East US'`<br/>
   c.  Create Secret: azure keyvault secret set -u \<vault-name\> -s \<secret-name\> --file \<private-key-file-name\><br/>
-         Ex: [azure keyvault secret set -u KeyVaultName -s SecretName --file ~/.ssh/id_rsa <br/>
-  d.  Enable the Key Vault for Template Deployments: azure keyvault set-policy -u \<vault-name\> --enabled-for-template-deployment true <br/>
-         Ex: [azure keyvault set-policy -u KeyVaultName --enabled-for-template-deployment true] <br/>
+         Ex: `azure keyvault secret set -u KeyVaultName -s SecretName --file ~/.ssh/id_rsa`<br/>
+  d.  Enable the Keyvvault for Template Deployment: azure keyvault set-policy -u \<vault-name\> --enabled-for-template-deployment true<br/>
+         Ex: `azure keyvault set-policy -u KeyVaultName --enabled-for-template-deployment true`<br/>
+
+3. **Create Key Vault using Azure CLI 2.0**<br/>
+  a.  Create new Resource Group: az group create -n \<name\> -l \<location\><br/>
+         Ex: `az group create -n ResourceGroupName -l 'East US'`<br/>
+  b.  Create Key Vault: az keyvault create -n \<vault-name\> -g \<resource-group\> -l \<location\> --enabled-for-template-deployment true<br/>
+         Ex: `az keyvault create -n KeyVaultName -g ResourceGroupName -l 'East US' --enabled-for-template-deployment true`<br/>
+  c.  Create Secret: az keyvault secret set --vault-name \<vault-name\> -n \<secret-name\> --file \<private-key-file-name\><br/>
+         Ex: `az keyvault secret set --vault-name KeyVaultName -n SecretName --file ~/.ssh/id_rsa`<br/>
 
 ### azuredeploy.Parameters.json File Explained
 
@@ -64,9 +72,6 @@ You will need to create a Key Vault to store your SSH Private Key that will then
 10. adminUsername: Admin username for both OS login and OpenShift login
 11. adminPassword: Password for OpenShift login
 12. sshPublicKey: Copy your SSH Public Key here
-13. subscriptionId: Your Subscription ID<br/>
-    a. PowerShell: get-AzureAccount
-	b. Azure CLI: azure account show - Field is ID
 14. keyVaultResourceGroup: The name of the Resource Group that contains the Key Vault
 15. keyVaultName: The name of the Key Vault you created
 16. keyVaultSecret: The Secret Name you used when creating the Secret
