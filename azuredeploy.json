@@ -61,6 +61,7 @@
 		"openshiftMasterHostname": {
 			"type": "string",
 			"minLength": 1,
+			"maxLength": 8,
 			"metadata": {
 				"description": "OpenShift Master hostname"
 			}
@@ -82,6 +83,7 @@
 		"nodePrefix": {
 			"type": "string",
 			"minLength": 1,
+			"maxLength": 8,
 			"metadata": {
 				"description": "OpenShift Node VM prefix"
 			}
@@ -155,7 +157,7 @@
 	},
 	"variables": {
 		"location": "[resourceGroup().location]",
-		"subscriptionId": "[subscription().subscriptionId]"
+		"subscriptionId": "[subscription().subscriptionId]",
 		"apiVersionCompute": "2015-06-15",
 		"apiVersionNetwork": "2015-06-15",
 		"apiVersionStorage": "2015-06-15",

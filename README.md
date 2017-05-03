@@ -64,10 +64,10 @@ You will need to create a Key Vault to store your SSH Private Key that will then
 2.  masterVmSize: Select from one of the allowed VM sizes listed in the azuredeploy.json file
 3.  nodeVmSize: Select from one of the allowed VM sizes listed in the azuredeploy.json file
 4.  osImage: Select from CentOS or RHEL for the Operating System
-5.  openshiftMasterHostName: Host name for the Master Node. Unique within your azure account
+5.  openshiftMasterHostName: Host name for the Master Node. Unique within the Resource Group. Maximum Length is 8 characters
 6.  openshiftMasterPublicIpDnsLabelPrefix: A unique Public DNS name to reference the Master Node by
 7.  nodeLbPublicIpDnsLabelPrefix: A unique Public DNS name to reference the Node Load Balancer by.  Used to access deployed applications
-8.  nodePrefix: prefix to be prepended to create host names for the Nodes. Unique within your azure account
+8.  nodePrefix: prefix to be prepended to create host names for the Nodes. Unique within the Resource Group. Maximum Length is 8 characters
 9.  nodeInstanceCount: Number of Nodes to deploy
 10. adminUsername: Admin username for both OS login and OpenShift login
 11. adminPassword: Password for OpenShift login
