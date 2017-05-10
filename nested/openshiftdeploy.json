@@ -1,4 +1,4 @@
-{
+﻿{
 	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
 	"contentVersion": "1.0.0.0",
 	"parameters": {
@@ -6,6 +6,40 @@
 			"type": "string",
 			"metadata": {
 				"description": "The base URL where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
+			}
+		},
+		"apiVersionCompute": {
+			"type": "string",
+			"metadata": {
+				"description": "API version for compute resources"
+			}
+		},
+		"newStorageAccountRegistry": {
+			"type": "string",
+			"minLength": 1,
+			"metadata": {
+				"description": "Storage Account for Docker Registry"
+			}
+		},
+		"newStorageAccountKey": {
+			"type": "string",
+			"minLength": 1,
+			"metadata": {
+				"description": "Storage Account Key for Docker Registry"
+			}
+		},
+		"newStorageAccountPersistentVolume1": {
+			"type": "string",
+			"minLength": 1,
+			"metadata": {
+				"description": "Storage Account for Persistent Volumes"
+			}
+		},
+		"newStorageAccountPV1Key": {
+			"type": "string",
+			"minLength": 1,
+			"metadata": {
+				"description": "Storage Account Key for Persistent Volumes"
 			}
 		},
 		"openshiftMasterHostname": {
@@ -29,11 +63,32 @@
 				"description": "OpenShift Master VM public IP address"
 			}
 		},
-		"nodePrefix": {
+		"openshiftInfraHostname": {
 			"type": "string",
 			"minLength": 1,
 			"metadata": {
-				"description": "OpenShift Node VM prefix"
+				"description": "OpenShift Infra Node hostname"
+			}
+		},
+		"openshiftNodeHostname": {
+			"type": "string",
+			"minLength": 1,
+			"metadata": {
+				"description": "OpenShift Node hostname"
+			}
+		},
+		"masterInstanceCount": {
+			"type": "int",
+			"minValue": 1,
+			"metadata": {
+				"description": "Number of OpenShift Master nodes"
+			}
+		},
+		"infraInstanceCount": {
+			"type": "int",
+			"minValue": 1,
+			"metadata": {
+				"description": "Number of OpenShift Infra nodes"
 			}
 		},
 		"nodeInstanceCount": {
@@ -50,11 +105,25 @@
 				"description": "Administrator username on all VMs"
 			}
 		},
-		"adminPassword": {
+		"openshiftPassword": {
 			"type": "securestring",
 			"minLength": 1,
 			"metadata": {
 				"description": "Administrator password for OpenShift Console"
+			}
+		},
+		"aadClientId": {
+			"type": "string",
+			"minLength": 1,
+			"metadata": {
+				"description": "Azure AD Client ID"
+			}
+		},
+		"aadClientSecret": {
+			"type": "securestring",
+			"minLength": 1,
+			"metadata": {
+				"description": "Azure AD Client Secret"
 			}
 		},
 		"xipioDomain": {
@@ -84,15 +153,19 @@
 		}
 	},
 	"variables": {
-		"sshKeyPath": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
+		"singlequote": "'",
+		"tenantId": "[subscription().tenantId]",
+		"subscriptionId": "[subscription().subscriptionId]",
+		"location": "[resourceGroup().location]",
+		"resourceGroupName": "[resourceGroup().name]",
 		"openshiftDeploymentScriptUrl": "[concat(parameters('_artifactsLocation'), 'scripts/deployOpenShift.sh')]",
 		"openshiftDeploymentScriptFileName": "deployOpenShift.sh"
 	},
 	"resources": [{
 		"type": "Microsoft.Compute/virtualMachines/extensions",
-		"name": "[concat(parameters('openshiftMasterHostname'), '/deployOpenShift')]",
+		"name": "[concat(parameters('openshiftMasterHostname'), '-0/deployOpenShift')]",
 		"location": "[resourceGroup().location]",
-		"apiVersion": "2015-06-15",
+		"apiVersion": "[parameters('apiVersionCompute')]",
 		"tags": {
 			"displayName": "DeployOpenShift"
 		},
@@ -107,7 +180,7 @@
 				]
 			},
 			"protectedSettings": {
-				"commandToExecute": "[concat('bash ', variables('openshiftDeploymentScriptFileName'), ' \"', parameters('adminUsername'), '\" \"', parameters('adminPassword'), '\" \"', parameters('sshPrivateKey'), '\" \"', parameters('openshiftMasterHostname'), '\" \"', parameters('openshiftMasterPublicIpFqdn'), '\" \"', parameters('openshiftMasterPublicIpAddress'), '\" \"', parameters('nodePrefix'), '\" \"', parameters('nodeInstanceCount'), '\" \"', parameters(parameters('subDomainChosen')), '\"')]"
+				"commandToExecute": "[concat('bash ', variables('openshiftDeploymentScriptFileName'), ' \"', parameters('adminUsername'), '\" ', variables('singlequote'), parameters('openshiftPassword'), variables('singlequote'), ' \"', parameters('sshPrivateKey'), '\" \"', parameters('openshiftMasterHostname'), '\" \"', parameters('openshiftMasterPublicIpFqdn'), '\" \"', parameters('openshiftMasterPublicIpAddress'), '\" \"', parameters('openshiftInfraHostname'), '\" \"', parameters('openshiftNodeHostname'), '\" \"', parameters('nodeInstanceCount'), '\" \"', parameters('infraInstanceCount'), '\" \"', parameters('MasterInstanceCount'), '\" \"', parameters(parameters('subDomainChosen')), '\" \"', parameters('newStorageAccountRegistry'), '\" ', variables('singlequote'), parameters('newStorageAccountKey'), variables('singlequote'), ' ', variables('singlequote'), variables('tenantId'), variables('singlequote'), ' ', variables('singlequote'), variables('subscriptionId'), variables('singlequote'), ' ', variables('singlequote'), parameters('aadClientId'), variables('singlequote'), ' ', variables('singlequote'), parameters('aadClientSecret'), variables('singlequote'), ' ', variables('singlequote'), variables('resourceGroupName'), variables('singlequote'), ' ', variables('singlequote'), variables('location'), variables('singlequote'), ' ', variables('singlequote'), parameters('newStorageAccountPersistentVolume1'), variables('singlequote'), ' ', variables('singlequote'), parameters('newStorageAccountPV1Key'), variables('singlequote'))]"
 			}
 		}
 	}],

@@ -2,22 +2,29 @@
 echo $(date) " - Starting Script"
 
 # Update system to latest packages and install dependencies
-echo $(date) " - Install base packages and update system to latest packages"
+echo $(date) " - Update system to latest packages and install dependencies"
+
+yum -y install wget git net-tools bind-utils iptables-services bridge-utils bash-completion
 yum -y update --exclude=WALinuxAgent
-yum -y install wget git net-tools bind-utils iptables-services bridge-utils bash-completion pyOpenSSL httpd-tools
 
-# COPR for 1.5rc0
-yum-config-manager --add-repo=https://copr.fedorainfracloud.org/coprs/jdetiber/origin/repo/epel-7/jdetiber-origin-epel-7.repo
+# Install COPR
 
-# Install the epel repo if not already present
-yum -y install https://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-9.noarch.rpm
+#yum-config-manager --add-repo=https://copr.fedorainfracloud.org/coprs/jdetiber/origin/repo/epel-7/jdetiber-origin-epel-7.repo
 
-# Clean yum metadata and cache to make sure we see the latest packages available
-yum -y clean all
+# Install EPEL repository and install Ansible
+echo $(date) " - Installing EPEL and Ansible"
 
-# Install Docker 1.12.5
-echo $(date) " - Installing Docker 1.12.5"
-yum -y install docker-1.12.5
+yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+
+sed -i -e "s/^enabled=1/enabled=0/" /etc/yum.repos.d/epel.repo
+
+#yum -y --enablerepo=epel install ansible pyOpenSSL
+
+# Install Docker 1.12.x
+echo $(date) " - Installing Docker 1.12.x"
+
+yum -y install docker
+sed -i -e "s#^OPTIONS='--selinux-enabled'#OPTIONS='--selinux-enabled --insecure-registry 172.30.0.0/16'#" /etc/sysconfig/docker
 
 # Create thin pool logical volume for Docker
 echo $(date) " - Creating thin pool logical volume for Docker and staring service"
@@ -32,11 +39,13 @@ then
    echo "Docker thin pool logical volume created successfully"
 else
    echo "Error creating logical volume for Docker"
-   exit 3
+   exit 5
 fi
 
 # Enable and start Docker services
+
 systemctl enable docker
 systemctl start docker
 
 echo $(date) " - Script Complete"
+
