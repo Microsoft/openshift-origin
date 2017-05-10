@@ -76,7 +76,7 @@ EOF
 
 echo $(date) " - Installing Azure CLI"
 
-yum -y install nodejs
+yum -y --enablerepo=epel install nodejs
 
 npm install -g azure-cli
 
