@@ -47,7 +47,7 @@ From a Linux or Mac, you can just use the ssh-keygen command. Once you are finis
 
 You will need to create a Key Vault to store your SSH Private Key that will then be used as part of the deployment.
 
-1. Create Key Vault using Powershell <br/>
+1. **Create Key Vault using Powershell**<br/>
   a.  Create new resource group: New-AzureRMResourceGroup -Name 'ResourceGroupName' -Location 'West US'<br/>
   b.  Create key vault: New-AzureRmKeyVault -VaultName 'KeyVaultName' -ResourceGroup 'ResourceGroupName' -Location 'West US'<br/>
   c.  Create variable with sshPrivateKey: $securesecret = ConvertTo-SecureString -String '[copy ssh Private Key here - including line feeds]' -AsPlainText -Force<br/>
