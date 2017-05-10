@@ -351,9 +351,10 @@ cat > /home/${SUDOUSER}/setup-azure-node.yml <<EOF
     - restart origin-node
   - name: delete the node so it can recreate itself
     command: oc delete node {{inventory_hostname}}
+    delegate_to: ${MASTER}-0
   - name: sleep to let node come back to life
     pause:
-       seconds: 100
+       seconds: 120
 EOF
 
 # Create Ansible Hosts File
