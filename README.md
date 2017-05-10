@@ -19,10 +19,10 @@ This template deploys OpenShift Origin with basic username / password for authen
 |Master Load Balancer	|1 probe and 1 rule for TCP 8443 <br/> NAT rules for SSH on Ports 2200-220X                                           |
 |Infra Load Balancer	|2 probes and 2 rules for TCP 80, and TCP 443 									                                             |
 |Public IP Addresses	|OpenShift Master public IP attached to Master Load Balancer<br />OpenShift Router public IP attached to Infra Load Balancer            |
-|Storage Accounts   	|1 Storage Accounts for Master VMs<br />1 Storage Accounts for Infra VMs<br />2 Storage Accounts for Node VMs<br />1 Storage Account for Private Docker Registry<br /> Storage Account for Persistent Volume  |
+|Storage Accounts   	|1 Storage Accounts for Master VMs<br />1 Storage Accounts for Infra VMs<br />2 Storage Accounts for Node VMs<br />1 Storage Account for Private Docker Registry<br />1 Storage Account for Persistent Volume  |
 |Network Security Groups|1 Network Security Group Master VMs<br />1 Network Security Group for Infra VMs<br />1 Network Security Group for Node VMs  |
 |Availability Sets      |1 Availability Set for Master VMs<br />1 Availability Set for Infra VMs<br />1 Availability Set for Node VMs  |
-|Virtual Machines   	|1, 2, or 3 Masters. First Master is used to run Ansible Playbook to install OpenShift<br />1, 2, or 3 Infra nodes<br />User-defined number of nodes (1 to 30)<br />All VMs include a single attached data disk for Docker thin pool logical volume|
+|Virtual Machines   	|1, 2, or 3 Masters. First Master is used to run Ansible Playbook to install OpenShift<br />1, 2, or 3 Infra nodes<br />User-defined number of Nodes (1 to 30)<br />All VMs include a single attached data disk for Docker thin pool logical volume|
 
 If you have a Red Hat subscription and would like to deploy an OpenShift Container Platform (formerly OpenShift Enterprise) cluster, please visit: https://github.com/Microsoft/openshift-container-platform
 
@@ -37,8 +37,10 @@ This template allows you to choose between CentOS or the On-Demand Red Hat Enter
 
 ### Generate SSH Keys
 
-You'll need to generate a pair of SSH keys in order to provision this template. Ensure that you do **NOT** include a passphrase with the private key. <br/>
-If you are using a Windows computer, you can download puttygen.exe. You will need to export to OpenSSH (from Conversions menu) to get a valid Private Key for use in the Template.<br/>
+You'll need to generate a pair of SSH keys in order to provision this template. Ensure that you do **NOT** include a passphrase with the private key.
+
+If you are using a Windows computer, you can download puttygen.exe. You will need to export to OpenSSH (from Conversions menu) to get a valid Private Key for use in the Template.
+
 From a Linux or Mac, you can just use the ssh-keygen command. Once you are finished deploying the cluster, you can always generate new keys that uses a passphrase and replace the original ones used during inital deployment.
 
 ### Create Key Vault to store SSH Private Key
@@ -194,7 +196,7 @@ Be sure to follow the OpenShift instructions to create the ncessary DNS entry fo
 
 If you encounter an error during deployment of the cluster, please view the deployment status. The following Error Codes will help to narrow things down.
 
-3. Exit Code 5: Unable to provision Docker Thin Pool Volume
+1. Exit Code 5: Unable to provision Docker Thin Pool Volume
 
 For further troubleshooting, please SSH into your master0 node on port 2200. You will need to be root **(sudo su -)** and then navigate to the following directory: **/var/lib/waagent/custom-script/download**<br/><br/>
 You should see a folder named '0' and '1'. In each of these folders, you will see two files, stderr and stdout. You can look through these files to determine where the failure occurred.
@@ -208,18 +210,13 @@ You can configure additional settings per the official [OpenShift Origin Documen
 Few options you have
 
 1. Deployment Output
-
   a. openshiftConsoleUrl the openshift console url<br/>
   b. openshiftMasterSsh  ssh command for master node<br/>
   c. openshiftNodeLoadBalancerFQDN node load balancer<br/>
-
-  get the deployment output data
-
+2. Get the deployment output data
   a. portal.azure.com -> choose 'Resource groups' select your group select 'Deployments' and there the deployment 'Microsoft.Template'. As output from the deployment it contains information about the openshift console url, ssh command and load balancer url.<br/>
   b. With the Azure CLI : azure group deployment list &lt;resource group name> 
-
-2. add additional users. you can find much detail about this in the openshift.org documentation under 'Cluster Administration' and 'Managing Users'. This installation uses htpasswd as the identity provider. To add more users, ssh in to each master node and execute following command:
-
+3. Add additional users. you can find much detail about this in the openshift.org documentation under 'Cluster Administration' and 'Managing Users'. This installation uses htpasswd as the identity provider. To add more users, ssh in to each master node and execute following command:
    ```sh
    sudo htpasswd /etc/origin/master/htpasswd user1
    ```
