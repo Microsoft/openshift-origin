@@ -298,7 +298,7 @@ EOF
 
 fi
 
-# Create Azure Cloud Provider configuration Playbook for Node Config (Master Nodes0)
+# Create Azure Cloud Provider configuration Playbook for Node Config (Master Nodes)
 
 cat > /home/${SUDOUSER}/setup-azure-node-master.yml <<EOF
 #!/usr/bin/ansible-playbook 
@@ -353,7 +353,7 @@ cat > /home/${SUDOUSER}/setup-azure-node-master.yml <<EOF
     - restart origin-node
 EOF
 
-# Create Azure Cloud Provider configuration Playbook for Node Config (Non-Master Nodes0)
+# Create Azure Cloud Provider configuration Playbook for Node Config (Non-Master Nodes)
 
 cat > /home/${SUDOUSER}/setup-azure-node.yml <<EOF
 #!/usr/bin/ansible-playbook 
@@ -412,6 +412,25 @@ cat > /home/${SUDOUSER}/setup-azure-node.yml <<EOF
   - name: sleep to let node come back to life
     pause:
        seconds: 90
+EOF
+
+# Create Playbook to delete stuck Master nodes and set as not schedulable
+
+cat > /home/${SUDOUSER}/deletestucknodes.yml <<EOF
+- hosts: masters
+  gather_facts: no
+  become: yes
+  vars:
+    description: "Delete stuck nodes"
+  tasks:
+  - name: Delete stuck nodes so it can recreate itself
+    command: oc delete node {{inventory_hostname}}
+    delegate_to: hworiginh-master-0
+  - name: sleep between deletes
+    pause:
+      seconds: 5
+  - name: set masters as unschedulable
+    command: oadm manage-node {{inventory_hostname}} --schedulable=false
 EOF
 
 # Create Ansible Hosts File
@@ -634,9 +653,10 @@ echo $(date) "- Configuring OpenShift Cloud Provider to be Azure"
 runuser -l $SUDOUSER -c "ansible-playbook ~/setup-azure-master.yml"
 runuser -l $SUDOUSER -c "ansible-playbook ~/setup-azure-node-master.yml"
 runuser -l $SUDOUSER -c "ansible-playbook ~/setup-azure-node.yml"
+runuser -l $SUDOUSER -c "ansible-playbook ~/deletestucknodes.yml"
 
-# Delete postinstall.yml file
-echo $(date) "- Deleting unecessary files"
+# Delete postinstall files
+echo $(date) "- Deleting post installation files"
 
 rm /home/${SUDOUSER}/addocpuser.yml
 rm /home/${SUDOUSER}/assignclusteradminrights.yml
@@ -645,5 +665,6 @@ rm /home/${SUDOUSER}/vars.yml
 rm /home/${SUDOUSER}/setup-azure-master.yml
 rm /home/${SUDOUSER}/setup-azure-node-master.yml
 rm /home/${SUDOUSER}/setup-azure-node.yml
+rm /home/${SUDOUSER}/deletestucknodes.yml
 
 echo $(date) " - Script complete"
