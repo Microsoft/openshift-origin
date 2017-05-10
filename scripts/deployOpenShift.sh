@@ -425,7 +425,7 @@ cat > /home/${SUDOUSER}/deletestucknodes.yml <<EOF
   tasks:
   - name: Delete stuck nodes so it can recreate itself
     command: oc delete node {{inventory_hostname}}
-    delegate_to: hworiginh-master-0
+    delegate_to: ${MASTER}-0
   - name: sleep between deletes
     pause:
       seconds: 5
@@ -657,6 +657,7 @@ runuser -l $SUDOUSER -c "ansible-playbook ~/deletestucknodes.yml"
 
 # Delete postinstall files
 echo $(date) "- Deleting post installation files"
+
 
 rm /home/${SUDOUSER}/addocpuser.yml
 rm /home/${SUDOUSER}/assignclusteradminrights.yml
