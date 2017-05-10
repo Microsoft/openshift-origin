@@ -31,8 +31,8 @@ MASTERLOOP=$((MASTERCOUNT - 1))
 INFRALOOP=$((INFRACOUNT - 1))
 NODELOOP=$((NODECOUNT - 1))
 
-# Create Container in PV Storage Accounts
-echo $(date) " - Creating container in PV Storage Accounts"
+# Create vhds Container in PV Storage Account
+echo $(date) " - Creating vhds container in PV Storage Account"
 
 azure telemetry --disable
 azure login --service-principal -u $AADCLIENTID -p $AADCLIENTSECRET --tenant $TENANTID
@@ -42,12 +42,10 @@ azure storage container create -a $STORAGEACCOUNT1 -k $SAKEY1 --container vhds
 # Generate private keys for use by Ansible
 echo $(date) " - Generating Private keys for use by Ansible for OpenShift Installation"
 
-echo "Generating Private Keys"
-
 runuser -l $SUDOUSER -c "echo \"$PRIVATEKEY\" > ~/.ssh/id_rsa"
 runuser -l $SUDOUSER -c "chmod 600 ~/.ssh/id_rsa*"
 
-echo "Configuring SSH ControlPath to use shorter path name"
+echo $(date) "- Configuring SSH ControlPath to use shorter path name"
 
 sed -i -e "s/^# control_path = %(directory)s\/%%h-%%r/control_path = %(directory)s\/%%h-%%r/" /etc/ansible/ansible.cfg
 sed -i -e "s/^#host_key_checking = False/host_key_checking = False/" /etc/ansible/ansible.cfg
@@ -74,8 +72,8 @@ echo $(date) " - Updating ansible.cfg file"
 
 ansible-playbook ./updateansiblecfg.yaml
 
-# Create Ansible Playbook for Post Installation task
-echo $(date) " - Create Ansible Playbook for Post Installation task"
+# Create Ansible Playbooks for Post Installation tasks
+echo $(date) " - Create Ansible Playbooks for Post Installation tasks"
 
 # Run on all masters - Create Inital OpenShift User on all Masters
 
@@ -95,7 +93,7 @@ cat > /home/${SUDOUSER}/addocpuser.yml <<EOF
     shell: htpasswd -cb /etc/origin/master/htpasswd ${SUDOUSER} "${PASSWORD}"
 EOF
 
-# Run on only MASTER-0 - Make initial OpenShift User a Cluster Admin
+# Run on MASTER-0 - Make initial OpenShift User a Cluster Admin
 
 cat > /home/${SUDOUSER}/assignclusteradminrights.yml <<EOF
 ---
@@ -111,7 +109,7 @@ cat > /home/${SUDOUSER}/assignclusteradminrights.yml <<EOF
     shell: oadm policy add-cluster-role-to-user cluster-admin $SUDOUSER --config=/etc/origin/master/admin.kubeconfig
 EOF
 
-# Run on MASTER-0 node - configure registry to use Azure Storage
+# Run on MASTER-0 - configure registry to use Azure Storage
 
 cat > /home/${SUDOUSER}/dockerregistry.yml <<EOF
 ---
@@ -127,7 +125,7 @@ cat > /home/${SUDOUSER}/dockerregistry.yml <<EOF
     shell: oc env dc docker-registry -e REGISTRY_STORAGE=azure -e REGISTRY_STORAGE_AZURE_ACCOUNTNAME=$REGISTRYSA -e REGISTRY_STORAGE_AZURE_ACCOUNTKEY=$ACCOUNTKEY -e REGISTRY_STORAGE_AZURE_CONTAINER=registry
 EOF
 
-# Run on MASTER-0 node - configure Storage Class
+# Run on MASTER-0 - configure Storage Class
 
 cat > /home/${SUDOUSER}/configurestorageclass.yml <<EOF
 ---
@@ -158,6 +156,8 @@ EOF
 
 if [ $MASTERCOUNT -eq 1 ]
 then
+
+# Single Master Configuration
 
 cat > /home/${SUDOUSER}/setup-azure-master.yml <<EOF
 #!/usr/bin/ansible-playbook 
@@ -223,6 +223,8 @@ cat > /home/${SUDOUSER}/setup-azure-master.yml <<EOF
 EOF
 
 else
+
+# Multiple Master Configuration
 
 cat > /home/${SUDOUSER}/setup-azure-master.yml <<EOF
 #!/usr/bin/ansible-playbook 
@@ -363,6 +365,8 @@ echo $(date) " - Create Ansible Hosts file"
 if [ $MASTERCOUNT -eq 1 ]
 then
 
+# Ansible Host file for Single Master Configuration
+
 cat > /etc/ansible/hosts <<EOF
 # Create an OSEv3 group that contains the masters and nodes groups
 [OSEv3:children]
@@ -435,6 +439,8 @@ cat >> /etc/ansible/hosts <<EOF
 EOF
 
 else
+
+# Ansible Host file for Multiple Master Configuration
 
 cat > /etc/ansible/hosts <<EOF
 # Create an OSEv3 group that contains the masters and nodes groups
@@ -553,8 +559,8 @@ echo $(date) "- Assigning cluster admin rights to user"
 
 runuser -l $SUDOUSER -c "ansible-playbook ~/assignclusteradminrights.yml"
 
-# Create Storage Classes
-echo $(date) "- Creating Storage Classes"
+# Create Storage Class
+echo $(date) "- Creating Storage Class"
 
 runuser -l $SUDOUSER -c "ansible-playbook ~/configurestorageclass.yml"
 
@@ -578,7 +584,9 @@ echo $(date) "- Deleting unecessary files"
 
 rm /home/${SUDOUSER}/addocpuser.yml
 rm /home/${SUDOUSER}/assignclusteradminrights.yml
-rm /home/${SUDOUSER}/assignrootpassword.yml
 rm /home/${SUDOUSER}/dockerregistry.yml
+rm /home/${SUDOUSER}/vars.yml
+rm /home/${SUDOUSER}/setup-azure-master.yml
+rm /home/${SUDOUSER}/setup-azure-node.yml
 
 echo $(date) " - Script complete"

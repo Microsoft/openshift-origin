@@ -7,18 +7,12 @@ echo $(date) " - Update system to latest packages and install dependencies"
 yum -y install wget git net-tools bind-utils iptables-services bridge-utils bash-completion
 yum -y update --exclude=WALinuxAgent
 
-# Install COPR
-
-#yum-config-manager --add-repo=https://copr.fedorainfracloud.org/coprs/jdetiber/origin/repo/epel-7/jdetiber-origin-epel-7.repo
-
-# Install EPEL repository and install Ansible
-echo $(date) " - Installing EPEL and Ansible"
+# Install EPEL repository
+echo $(date) " - Installing EPEL"
 
 yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 
 sed -i -e "s/^enabled=1/enabled=0/" /etc/yum.repos.d/epel.repo
-
-#yum -y --enablerepo=epel install ansible pyOpenSSL
 
 # Install Docker 1.12.x
 echo $(date) " - Installing Docker 1.12.x"
