@@ -298,11 +298,66 @@ EOF
 
 fi
 
-# Create Azure Cloud Provider configuration Playbook for Node Config
+# Create Azure Cloud Provider configuration Playbook for Node Config (Master Nodes0)
+
+cat > /home/${SUDOUSER}/setup-azure-node-master.yml <<EOF
+#!/usr/bin/ansible-playbook 
+- hosts: masters
+  serial: 1
+  gather_facts: no
+  vars_files:
+  - vars.yml
+  become: yes
+  vars:
+    azure_conf_dir: /etc/azure
+    azure_conf: "{{ azure_conf_dir }}/azure.conf"
+    node_conf: /etc/origin/node/node-config.yaml
+  handlers:
+  - name: restart origin-node
+    systemd:
+      state: restarted
+      name: origin-node
+  post_tasks:
+  - name: make sure /etc/azure exists
+    file:
+      state: directory
+      path: "{{ azure_conf_dir }}"
+
+  - name: populate /etc/azure/azure.conf
+    copy:
+      dest: "{{ azure_conf }}"
+      content: |
+        {
+          "aadClientID" : "{{ g_aadClientId }}",
+          "aadClientSecret" : "{{ g_aadClientSecret }}",
+          "subscriptionID" : "{{ g_subscriptionId }}",
+          "tenantID" : "{{ g_tenantId }}",
+          "resourceGroup": "{{ g_resourceGroup }}",
+        } 
+    notify:
+    - restart origin-node
+  - name: insert the azure disk config into the node
+    modify_yaml:
+      dest: "{{ node_conf }}"
+      yaml_key: "{{ item.key }}"
+      yaml_value: "{{ item.value }}"
+    with_items:
+    - key: kubeletArguments.cloud-config
+      value:
+      - "{{ azure_conf }}"
+
+    - key: kubeletArguments.cloud-provider
+      value:
+      - azure
+    notify:
+    - restart origin-node
+EOF
+
+# Create Azure Cloud Provider configuration Playbook for Node Config (Non-Master Nodes0)
 
 cat > /home/${SUDOUSER}/setup-azure-node.yml <<EOF
 #!/usr/bin/ansible-playbook 
-- hosts: all
+- hosts: nodes:!masters
   serial: 1
   gather_facts: no
   vars_files:
@@ -356,7 +411,7 @@ cat > /home/${SUDOUSER}/setup-azure-node.yml <<EOF
     delegate_to: ${MASTER}-0
   - name: sleep to let node come back to life
     pause:
-       seconds: 120
+       seconds: 90
 EOF
 
 # Create Ansible Hosts File
@@ -577,6 +632,7 @@ sleep 120
 echo $(date) "- Configuring OpenShift Cloud Provider to be Azure"
 
 runuser -l $SUDOUSER -c "ansible-playbook ~/setup-azure-master.yml"
+runuser -l $SUDOUSER -c "ansible-playbook ~/setup-azure-node-master.yml"
 runuser -l $SUDOUSER -c "ansible-playbook ~/setup-azure-node.yml"
 
 # Delete postinstall.yml file
@@ -587,6 +643,7 @@ rm /home/${SUDOUSER}/assignclusteradminrights.yml
 rm /home/${SUDOUSER}/dockerregistry.yml
 rm /home/${SUDOUSER}/vars.yml
 rm /home/${SUDOUSER}/setup-azure-master.yml
+rm /home/${SUDOUSER}/setup-azure-node-master.yml
 rm /home/${SUDOUSER}/setup-azure-node.yml
 
 echo $(date) " - Script complete"
