@@ -2,8 +2,7 @@
 echo $(date) " - Starting Script"
 
 STORAGEACCOUNT1=$1
-STORAGEACCOUNT2=$2
-SUDOUSER=$3
+SUDOUSER=$2
 
 # Update system to latest packages and install dependencies
 echo $(date) " - Update system to latest packages and install dependencies"
