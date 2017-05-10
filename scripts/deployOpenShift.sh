@@ -172,10 +172,10 @@ cat > /home/${SUDOUSER}/setup-azure-master.yml <<EOF
     azure_conf: "{{ azure_conf_dir }}/azure.conf"
     master_conf: /etc/origin/master/master-config.yaml
   handlers:
-  - name: restart atomic-openshift-master
+  - name: restart origin-master
     systemd:
       state: restarted
-      name: atomic-openshift-master
+      name: origin-master
 
   post_tasks:
   - name: make sure /etc/azure exists
@@ -195,7 +195,7 @@ cat > /home/${SUDOUSER}/setup-azure-master.yml <<EOF
           "resourceGroup": "{{ g_resourceGroup }}",
         } 
     notify:
-    - restart atomic-openshift-master
+    - restart origin-master
 
   - name: insert the azure disk config into the master
     modify_yaml:
@@ -219,7 +219,7 @@ cat > /home/${SUDOUSER}/setup-azure-master.yml <<EOF
       value:
       - azure
     notify:
-    - restart atomic-openshift-master
+    - restart origin-master
 EOF
 
 else
@@ -237,15 +237,15 @@ cat > /home/${SUDOUSER}/setup-azure-master.yml <<EOF
     azure_conf: "{{ azure_conf_dir }}/azure.conf"
     master_conf: /etc/origin/master/master-config.yaml
   handlers:
-  - name: restart atomic-openshift-master-api
+  - name: restart origin-master-api
     systemd:
       state: restarted
-      name: atomic-openshift-master-api
+      name: origin-master-api
 
-  - name: restart atomic-openshift-master-controllers
+  - name: restart origin-master-controllers
     systemd:
       state: restarted
-      name: atomic-openshift-master-controllers
+      name: origin-master-controllers
 
   post_tasks:
   - name: make sure /etc/azure exists
@@ -265,8 +265,8 @@ cat > /home/${SUDOUSER}/setup-azure-master.yml <<EOF
           "resourceGroup": "{{ g_resourceGroup }}",
         } 
     notify:
-    - restart atomic-openshift-master-api
-    - restart atomic-openshift-master-controllers
+    - restart origin-master-api
+    - restart origin-master-controllers
 
   - name: insert the azure disk config into the master
     modify_yaml:
@@ -290,8 +290,8 @@ cat > /home/${SUDOUSER}/setup-azure-master.yml <<EOF
       value:
       - azure
     notify:
-    - restart atomic-openshift-master-api
-    - restart atomic-openshift-master-controllers
+    - restart origin-master-api
+    - restart origin-master-controllers
 EOF
 
 fi
@@ -311,10 +311,10 @@ cat > /home/${SUDOUSER}/setup-azure-node.yml <<EOF
     azure_conf: "{{ azure_conf_dir }}/azure.conf"
     node_conf: /etc/origin/node/node-config.yaml
   handlers:
-  - name: restart atomic-openshift-node
+  - name: restart origin-node
     systemd:
       state: restarted
-      name: atomic-openshift-node
+      name: origin-node
   post_tasks:
   - name: make sure /etc/azure exists
     file:
@@ -333,7 +333,7 @@ cat > /home/${SUDOUSER}/setup-azure-node.yml <<EOF
           "resourceGroup": "{{ g_resourceGroup }}",
         } 
     notify:
-    - restart atomic-openshift-node
+    - restart origin-node
   - name: insert the azure disk config into the node
     modify_yaml:
       dest: "{{ node_conf }}"
@@ -348,13 +348,12 @@ cat > /home/${SUDOUSER}/setup-azure-node.yml <<EOF
       value:
       - azure
     notify:
-    - restart atomic-openshift-node
+    - restart origin-node
   - name: delete the node so it can recreate itself
     command: oc delete node {{inventory_hostname}}
-    delegate_to: ${BASTION}
   - name: sleep to let node come back to life
     pause:
-       minutes: 1
+       seconds: 100
 EOF
 
 # Create Ansible Hosts File
