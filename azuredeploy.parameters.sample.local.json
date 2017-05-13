@@ -5,34 +5,43 @@
 		"_artifactsLocation": {
 			"value": "https://raw.githubusercontent.com/Microsoft/openshift-origin/master/"
 		},
+		"osImage": {
+			"value": "centos"
+		},
 		"masterVmSize": {
+			"value": "Standard_DS3_v2"
+		},
+		"infraVmSize": {
 			"value": "Standard_DS3_v2"
 		},
 		"nodeVmSize": {
 			"value": "Standard_DS3_v2"
 		},
-		"osImage": {
-			"value": "centos"
-		},
-		"openshiftMasterHostname": {
-			"value": "master"
+		"openshiftClusterPrefix": {
+			"value": "mycluster"
 		},
 		"openshiftMasterPublicIpDnsLabelPrefix": {
 			"value": "me-master1"
 		},
-		"nodeLbPublicIpDnsLabelPrefix": {
+		"infraLbPublicIpDnsLabelPrefix": {
 			"value": "me-node1"
 		},
-		"nodePrefix": {
-			"value": "node"
+		"masterInstanceCount": {
+			"value": 1
+		},
+		"infraInstanceCount": {
+			"value": 1
 		},
 		"nodeInstanceCount": {
-			"value": 2
+			"value": 1
+		},
+		"dataDiskSize": {
+			"value": 128
 		},
 		"adminUsername": {
 			"value": "azureuser"
 		},
-		"adminPassword": {
+		"openshiftPassword": {
 			"value": "ThisIsYourSampleSecret!ShouldStayLocal!"
 		},
 		"sshPublicKey": {
@@ -46,6 +55,12 @@
 		},
 		"keyVaultSecret": {
 			"value": "OpenShiftPK1"
+		},
+		"aadClientId": {
+			"value": "ThisIsYourAzureADServicePrincipalClientID"
+		},
+		"aadClientSecret": {
+			"value": "ThisIsYourAzureADServicePrincipalClientSecret"
 		},
 		"defaultSubDomainType": {
 			"value": "xipio"

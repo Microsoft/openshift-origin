@@ -1,32 +1,34 @@
 #!/bin/bash
 echo $(date) " - Starting Script"
 
+STORAGEACCOUNT1=$1
+SUDOUSER=$2
+
 # Update system to latest packages and install dependencies
-echo $(date) " - Install base packages and update system to latest packages"
+echo $(date) " - Update system to latest packages and install dependencies"
+
+yum -y install wget git net-tools bind-utils iptables-services bridge-utils bash-completion httpd-tools
 yum -y update --exclude=WALinuxAgent
-yum -y install wget git net-tools bind-utils iptables-services bridge-utils bash-completion pyOpenSSL httpd-tools
 
-# COPR for 1.5rc0
-yum-config-manager --add-repo=https://copr.fedorainfracloud.org/coprs/jdetiber/origin/repo/epel-7/jdetiber-origin-epel-7.repo
+# Install EPEL repository
+echo $(date) " - Installing EPEL"
 
-# Install the epel repo if not already present
-yum -y install https://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-9.noarch.rpm
+yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 
-# Clean yum metadata and cache to make sure we see the latest packages available
-yum -y clean all
+sed -i -e "s/^enabled=1/enabled=0/" /etc/yum.repos.d/epel.repo
 
-# Install the Ansible
-echo $(date) " - Installing Ansible"
-# yum -y --enablerepo=epel install ansible
-# yum -y install http://ftp.uni-hannover.de/pub/mirror/linux/epel/7Server/x86_64/a/ansible-2.2.0.0-4.el7.noarch.rpm
-yum -y install http://mirror.centos.org/centos/7/paas/x86_64/openshift-origin/common/ansible-2.2.1.0-2.el7.noarch.rpm
+# Only install Ansible and pyOpenSSL on Master-0 Node
 
-# Disable EPEL to prevent unexpected packages from being pulled in during installation.
-yum-config-manager epel --disable
+if hostname -f|grep -- "-0" >/dev/null
+then
+   echo $(date) " - Installing Ansible and pyOpenSSL"
+   yum -y --enablerepo=epel install ansible pyOpenSSL
+fi
 
-# Install Docker 1.12.5
-echo $(date) " - Installing Docker 1.12.5"
-yum -y install docker-1.12.5
+# Install Docker 1.12.x
+echo $(date) " - Installing Docker 1.12.x"
+
+yum -y install docker
 sed -i -e "s#^OPTIONS='--selinux-enabled'#OPTIONS='--selinux-enabled --insecure-registry 172.30.0.0/16'#" /etc/sysconfig/docker
 
 # Create thin pool logical volume for Docker
@@ -42,11 +44,38 @@ then
    echo "Docker thin pool logical volume created successfully"
 else
    echo "Error creating logical volume for Docker"
-   exit 3
+   exit 5
 fi
 
 # Enable and start Docker services
+
 systemctl enable docker
 systemctl start docker
+
+# Create Storage Class yml files on MASTER-0
+
+if hostname -f|grep -- "-0" >/dev/null
+then
+cat <<EOF > /home/${SUDOUSER}/scgeneric1.yml
+kind: StorageClass
+apiVersion: storage.k8s.io/v1beta1
+metadata:
+  name: generic
+  annotations:
+    storageclass.beta.kubernetes.io/is-default-class: "true"
+provisioner: kubernetes.io/azure-disk
+parameters:
+  storageAccount: ${STORAGEACCOUNT1}
+EOF
+
+# Install Azure CLI
+
+echo $(date) " - Installing Azure CLI"
+
+yum -y --enablerepo=epel install nodejs
+
+npm install -g azure-cli
+
+fi
 
 echo $(date) " - Script Complete"
