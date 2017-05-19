@@ -20,10 +20,10 @@
 		"openshiftClusterPrefix": {
 			"value": "changeme"
 		},
-		"openshiftMasterPublicIpDnsLabelPrefix": {
+		"openshiftMasterPublicIpDnsLabel": {
 			"value": "changeme"
 		},
-		"infraLbPublicIpDnsLabelPrefix": {
+		"infraLbPublicIpDnsLabel": {
 			"value": "changeme"
 		},
 		"masterInstanceCount": {
