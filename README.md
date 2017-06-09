@@ -7,7 +7,7 @@ For the **OpenShift Container Platform** refer to https://github.com/Microsoft/o
 
 ## OpenShift Origin with Username / Password
 
-Current template deploys OpenShift Origin 1.5.0. 
+Current template deploys OpenShift Origin 1.5.1. 
 
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FMicrosoft%2Fopenshift-origin%2Fmaster%2Fazuredeploy.json" target="_blank"><img src="http://azuredeploy.net/deploybutton.png"/></a>
 
