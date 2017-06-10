@@ -605,7 +605,7 @@ fi
 echo $(date) " - Installing OpenShift Container Platform via Ansible Playbook"
 
 #runuser -l $SUDOUSER -c "git clone https://github.com/openshift/openshift-ansible /home/$SUDOUSER/openshift-ansible"
-runuser -l $SUDOUSER -c "git clone https://github.com/wmhussain/openshift-ansible/tree/wmhussain-patch-1 /home/$SUDOUSER/openshift-ansible"
+runuser -l $SUDOUSER -c "git clone -b wmhussain-patch-1 https://github.com/wmhussain/openshift-ansible/tree/wmhussain-patch-1 /home/$SUDOUSER/openshift-ansible"
 
 runuser -l $SUDOUSER -c "ansible-playbook openshift-ansible/playbooks/byo/config.yml"
 
