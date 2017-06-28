@@ -20,10 +20,10 @@
 		"openshiftClusterPrefix": {
 			"value": "mycluster"
 		},
-		"openshiftMasterPublicIpDnsLabelPrefix": {
+		"openshiftMasterPublicIpDnsLabel": {
 			"value": "me-master1"
 		},
-		"infraLbPublicIpDnsLabelPrefix": {
+		"infraLbPublicIpDnsLabel": {
 			"value": "me-node1"
 		},
 		"masterInstanceCount": {
