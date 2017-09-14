@@ -69,11 +69,14 @@ parameters:
 EOF
 
 # Install Azure CLI
-
 echo $(date) " - Installing Azure CLI"
-
+curl --silent --location https://rpm.nodesource.com/setup_6.x | sudo bash -
+curl --silent --location https://rpm.nodesource.com/setup_8.x | sudo bash -
+sudo yum -y install nodejs
+sudo yum install gcc-c++ make -y
 yum -y --enablerepo=epel install nodejs
 
+sudo npm install -g azure-cli
 npm install -g azure-cli
 
 fi
