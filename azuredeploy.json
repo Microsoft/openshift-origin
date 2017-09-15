@@ -10,14 +10,6 @@
 			},
 			"defaultValue": "https://raw.githubusercontent.com/Microsoft/openshift-origin/master/"
 		},
-		"osImage": {
-			"type": "string",
-			"allowedValues": ["centos", "rhel"],
-			"defaultValue": "centos",
-			"metadata": {
-				"description": "OS to use for image - centos or rhel"
-			}
-		},
 		"masterVmSize": {
 			"type": "string",
 			"defaultValue": "Standard_DS2_v2",
@@ -85,20 +77,6 @@
 			"maxLength": 20,
 			"metadata": {
 				"description": "OpenShift cluster prefix.  Used to generate master, infra and node hostnames.  Maximum of 20 characters."
-			}
-		},
-		"openshiftMasterPublicIpDnsLabel": {
-			"type": "string",
-			"minLength": 1,
-			"metadata": {
-				"description": "OpenShift Master Load Balancer public IP DNS name (hostname portion). Must be lowercase. It should match with the following regular expression: ^[a-z][a-z0-9-]{1,61}[a-z0-9]$ or it will raise an error."
-			}
-		},
-		"infraLbPublicIpDnsLabel": {
-			"type": "string",
-			"minLength": 1,
-			"metadata": {
-				"description": "OpenShift Infra Nodes Load Balancer public IP DNS name (hostname portion). Must be lowercase. It should match with the following regular expression: ^[a-z][a-z0-9-]{1,61}[a-z0-9]$ or it will raise an error."
 			}
 		},
 		"masterInstanceCount": {
@@ -234,10 +212,12 @@
 		"virtualNetworkName": "openshiftvnet",
 		"masterSubnetName": "mastersubnet",
 		"nodeSubnetName": "nodesubnet",
+		"infraLbPublicIpDnsLabel": "[concat('infradns', uniqueString(concat(resourceGroup().id, 'infra')))]",
+		"openshiftMasterPublicIpDnsLabel": "[concat('masterdns', uniqueString(concat(resourceGroup().id, 'master')))]",
 		"persistentVolume1Type": "Standard_LRS",
 		
 		"masterLoadBalancerName": "[concat(variables('openshiftMasterHostname'), 'lb')]",
-		"masterPublicIpAddressId": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('openshiftMasterPublicIpDnsLabel'))]",
+		"masterPublicIpAddressId": "[resourceId('Microsoft.Network/publicIPAddresses', variables('openshiftMasterPublicIpDnsLabel'))]",
 		"masterLbId": "[resourceId('Microsoft.Network/loadBalancers', variables('masterLoadBalancerName'))]",
 		"masterLbFrontEndConfigId": "[concat(variables('masterLbId'), '/frontendIPConfigurations/loadBalancerFrontEnd')]",
 		"masterLbBackendPoolId": "[concat(variables('masterLbId'),'/backendAddressPools/loadBalancerBackend')]",
@@ -245,12 +225,13 @@
 		"masterLb8443ProbeId": "[concat(variables('masterLbId'),'/probes/8443Probe')]",
 		
 		"infraLoadBalancerName": "[concat(variables('openshiftInfraHostname'), 'lb')]",
-		"infraPublicIpAddressId": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('infraLbPublicIpDnsLabel'))]",
+		"infraPublicIpAddressId": "[resourceId('Microsoft.Network/publicIPAddresses', variables('infraLbPublicIpDnsLabel'))]",
 		"infraLbId": "[resourceId('Microsoft.Network/loadBalancers', variables('infraLoadBalancerName'))]",
 		"infraLbFrontEndConfigId": "[concat(variables('infraLbId'), '/frontendIPConfigurations/loadBalancerFrontEnd')]",
 		"infraLbBackendPoolId": "[concat(variables('infraLbId'),'/backendAddressPools/loadBalancerBackend')]",
 		"infraLbHttpProbeId": "[concat(variables('infraLbId'),'/probes/httpProbe')]",
 		"infraLbHttpsProbeId": "[concat(variables('infraLbId'),'/probes/httpsProbe')]",
+		"osImage": "centos",
 		"centos": { 
 			"publisher": "Openlogic", 
 			"offer": "CentOS", 
@@ -260,7 +241,7 @@
 		"rhel": {
 			"publisher": "RedHat",
 			"offer": "RHEL",
-			"sku": "7.3",
+			"sku": "7-RAW",
 			"version": "latest"
 		},
 		"singlequote": "'",
@@ -669,7 +650,7 @@
 			}
 		}, {
 			"type": "Microsoft.Network/publicIPAddresses",
-			"name": "[parameters('infraLbPublicIpDnsLabel')]",
+			"name": "[variables('infraLbPublicIpDnsLabel')]",
 			"location": "[variables('location')]",
 			"apiVersion": "[variables('apiVersionNetwork')]",
 			"tags": {
@@ -678,12 +659,12 @@
 			"properties": {
 				"publicIPAllocationMethod": "Static",
 				"dnsSettings": {
-					"domainNameLabel": "[parameters('infraLbPublicIpDnsLabel')]"
+					"domainNameLabel": "[variables('infraLbPublicIpDnsLabel')]"
 				}
 			}
 		}, {
 			"type": "Microsoft.Network/publicIPAddresses",
-			"name": "[parameters('openshiftMasterPublicIpDnsLabel')]",
+			"name": "[variables('openshiftMasterPublicIpDnsLabel')]",
 			"location": "[variables('location')]",
 			"apiVersion": "[variables('apiVersionNetwork')]",
 			"tags": {
@@ -692,7 +673,7 @@
 			"properties": {
 				"publicIPAllocationMethod": "Static",
 				"dnsSettings": {
-					"domainNameLabel": "[parameters('openshiftMasterPublicIpDnsLabel')]"
+					"domainNameLabel": "[variables('openshiftMasterPublicIpDnsLabel')]"
 				}
 			}
 		}, {
@@ -722,7 +703,7 @@
 				"displayName": "OpenShiftMasterLB"
 			},
 			"dependsOn": [
-				"[concat('Microsoft.Network/publicIPAddresses/', parameters('openshiftMasterPublicIpDnsLabel'))]"
+				"[concat('Microsoft.Network/publicIPAddresses/', variables('openshiftMasterPublicIpDnsLabel'))]"
 			],
 			"properties": {
 				"frontendIPConfigurations": [{
@@ -797,7 +778,7 @@
 				"displayName": "OpenShiftInfraLB"
 			},
 			"dependsOn": [
-				"[concat('Microsoft.Network/publicIPAddresses/', parameters('infraLbPublicIpDnsLabel'))]"
+				"[concat('Microsoft.Network/publicIPAddresses/', variables('infraLbPublicIpDnsLabel'))]"
 			],
 			"properties": {
 				"frontendIPConfigurations": [{
@@ -1008,7 +989,7 @@
 						"value": "masteravailabilityset"
 					},
 					"osImage": {
-						"value": "[parameters('osImage')]"
+						"value": "[variables('osImage')]"
 					},
 					"hostname": {
 						"value": "[concat(variables('openshiftMasterHostname'), '-', copyIndex())]"
@@ -1069,7 +1050,7 @@
 						"value": "infraavailabilityset"
 					},
 					"osImage": {
-						"value": "[parameters('osImage')]"
+						"value": "[variables('osImage')]"
 					},
 					"hostname": {
 						"value": "[concat(variables('openshiftInfraHostname'), '-', copyIndex())]"
@@ -1131,7 +1112,7 @@
 						"value": "nodeavailabilityset"
 					},
 					"osImage": {
-						"value": "[parameters('osImage')]"
+						"value": "[variables('osImage')]"
 					},
 					"hostname": {
 						"value": "[concat(variables('openshiftNodeHostname'), '-', copyIndex())]"
@@ -1277,10 +1258,10 @@
 						"value": "[variables('openshiftMasterHostname')]"
 					},
 					"openshiftMasterPublicIpFqdn": {
-						"value": "[reference(parameters('openshiftMasterPublicIpDnsLabel')).dnsSettings.fqdn]"
+						"value": "[reference(variables('openshiftMasterPublicIpDnsLabel')).dnsSettings.fqdn]"
 					},
 					"openshiftMasterPublicIpAddress": {
-						"value": "[reference(parameters('openshiftMasterPublicIpDnsLabel')).ipAddress]"
+						"value": "[reference(variables('openshiftMasterPublicIpDnsLabel')).ipAddress]"
 					},
 					"openshiftInfraHostname": {
 						"value": "[variables('openshiftInfraHostname')]"
@@ -1310,7 +1291,7 @@
 						"value": "[parameters('aadClientSecret')]"
 					},
 					"xipioDomain": {
-						"value": "[concat(reference(parameters('infraLbPublicIpDnsLabel')).ipAddress, '.xip.io')]"
+						"value": "[concat(reference(variables('infraLbPublicIpDnsLabel')).ipAddress, '.xip.io')]"
 					},
 					"customDomain": {
 						"value": "[parameters('defaultSubDomain')]"
@@ -1333,15 +1314,15 @@
 	"outputs": {
 		"Openshift Console Url": {
 			"type": "string",
-			"value": "[concat('https://', reference(parameters('openshiftMasterPublicIpDnsLabel')).dnsSettings.fqdn, ':8443/console')]"
+			"value": "[concat('https://', reference(variables('openshiftMasterPublicIpDnsLabel')).dnsSettings.fqdn, ':8443/console')]"
 		},
 		"Openshift Master SSH": {
 			"type": "string",
-			"value": "[concat('ssh ', parameters('adminUsername'), '@', reference(parameters('openshiftMasterPublicIpDnsLabel')).dnsSettings.fqdn, ' -p 2200')]"
+			"value": "[concat('ssh ', parameters('adminUsername'), '@', reference(variables('openshiftMasterPublicIpDnsLabel')).dnsSettings.fqdn, ' -p 2200')]"
 		},
 		"Openshift Infra Load Balancer FQDN": {
 			"type": "string",
-			"value": "[reference(parameters('infraLbPublicIpDnsLabel')).dnsSettings.fqdn]"
+			"value": "[reference(variables('infraLbPublicIpDnsLabel')).dnsSettings.fqdn]"
 		},
 		"Node OS Storage Account Name": {
 			"type": "string",
