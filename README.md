@@ -4,6 +4,7 @@ Bookmark [aka.ms/OpenShift](http://aka.ms/OpenShift) for future reference.
 
 For the **OpenShift Container Platform** refer to https://github.com/Microsoft/openshift-container-platform
 
+Update log located in README_update.md
 
 ## OpenShift Origin with Username / Password
 
