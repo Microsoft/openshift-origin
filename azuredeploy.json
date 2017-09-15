@@ -24,7 +24,11 @@
 				"Standard_DS11", "Standard_DS12", "Standard_DS13", "Standard_DS14",
 				"Standard_DS1_v2", "Standard_DS2_v2", "Standard_DS3_v2", "Standard_DS4_v2", "Standard_DS5_v2",
 				"Standard_DS11_v2", "Standard_DS12_v2", "Standard_DS13_v2", "Standard_DS14_v2",
-				"Standard_GS1", "Standard_GS2", "Standard_GS3", "Standard_GS4", "Standard_GS5"
+				"Standard_GS1", "Standard_GS2", "Standard_GS3", "Standard_GS4", "Standard_GS5",
+				"Standard_D2_v3", "Standard_D4_v3", "Standard_D8_v3", "Standard_D16_v3", "Standard_D32_v3", "Standard_D64_v3",
+				"Standard_DS2_v3", "Standard_DS4_v3", "Standard_DS8_v3", "Standard_DS16_v3", "Standard_DS32_v3", "Standard_DS64_v3",
+				"Standard_E2_v3", "Standard_E4_v3", "Standard_E8_v3", "Standard_E16_v3", "Standard_E32_v3", "Standard_E64_v3",
+				"Standard_ES2_v3", "Standard_ES4_v3", "Standard_ES8_v3", "Standard_ES16_v3", "Standard_ES32_v3", "Standard_ES64_v3"
 			],
 			"metadata": {
 				"description": "OpenShift Master VM size"
@@ -44,7 +48,11 @@
 				"Standard_DS11", "Standard_DS12", "Standard_DS13", "Standard_DS14",
 				"Standard_DS1_v2", "Standard_DS2_v2", "Standard_DS3_v2", "Standard_DS4_v2", "Standard_DS5_v2",
 				"Standard_DS11_v2", "Standard_DS12_v2", "Standard_DS13_v2", "Standard_DS14_v2",
-				"Standard_GS1", "Standard_GS2", "Standard_GS3", "Standard_GS4", "Standard_GS5"
+				"Standard_GS1", "Standard_GS2", "Standard_GS3", "Standard_GS4", "Standard_GS5",
+				"Standard_D2_v3", "Standard_D4_v3", "Standard_D8_v3", "Standard_D16_v3", "Standard_D32_v3", "Standard_D64_v3",
+				"Standard_DS2_v3", "Standard_DS4_v3", "Standard_DS8_v3", "Standard_DS16_v3", "Standard_DS32_v3", "Standard_DS64_v3",
+				"Standard_E2_v3", "Standard_E4_v3", "Standard_E8_v3", "Standard_E16_v3", "Standard_E32_v3", "Standard_E64_v3",
+				"Standard_ES2_v3", "Standard_ES4_v3", "Standard_ES8_v3", "Standard_ES16_v3", "Standard_ES32_v3", "Standard_ES64_v3"
 			],
 			"metadata": {
 				"description": "OpenShift Node VM(s) size"
@@ -64,7 +72,11 @@
 				"Standard_DS11", "Standard_DS12", "Standard_DS13", "Standard_DS14",
 				"Standard_DS1_v2", "Standard_DS2_v2", "Standard_DS3_v2", "Standard_DS4_v2", "Standard_DS5_v2",
 				"Standard_DS11_v2", "Standard_DS12_v2", "Standard_DS13_v2", "Standard_DS14_v2",
-				"Standard_GS1", "Standard_GS2", "Standard_GS3", "Standard_GS4", "Standard_GS5"
+				"Standard_GS1", "Standard_GS2", "Standard_GS3", "Standard_GS4", "Standard_GS5",
+				"Standard_D2_v3", "Standard_D4_v3", "Standard_D8_v3", "Standard_D16_v3", "Standard_D32_v3", "Standard_D64_v3",
+				"Standard_DS2_v3", "Standard_DS4_v3", "Standard_DS8_v3", "Standard_DS16_v3", "Standard_DS32_v3", "Standard_DS64_v3",
+				"Standard_E2_v3", "Standard_E4_v3", "Standard_E8_v3", "Standard_E16_v3", "Standard_E32_v3", "Standard_E64_v3",
+				"Standard_ES2_v3", "Standard_ES4_v3", "Standard_ES8_v3", "Standard_ES16_v3", "Standard_ES32_v3", "Standard_ES64_v3"
 			],
 			"metadata": {
 				"description": "OpenShift Infra Node VM(s) size"
@@ -81,18 +93,16 @@
 		},
 		"masterInstanceCount": {
 			"type": "int",
-			"defaultValue": 1,
-			"minValue": 1,
-			"allowedValues": [1, 2, 3],
+			"defaultValue": 3,
+			"allowedValues": [2, 3],
 			"metadata": {
 				"description": "Number of OpenShift masters.  1 is non HA and 3 is for HA"
 			}
 		},
 		"infraInstanceCount": {
 			"type": "int",
-			"defaultValue": 1,
-			"minValue": 1,
-			"allowedValues": [1, 2, 3],
+			"defaultValue": 2,
+			"allowedValues": [2, 3],
 			"metadata": {
 				"description": "Number of OpenShift infra nodes.  1 is non HA.  Choose 2 or 3 for HA"
 			}
@@ -410,6 +420,78 @@
 				"storageAccountType": "Premium_LRS"
 			},
 			"Standard_GS5": {
+				"storageAccountType": "Premium_LRS"
+			},
+			"Standard_D2_v3": {
+				"storageAccountType": "Standard_LRS"
+			},
+			"Standard_D4_v3": {
+				"storageAccountType": "Standard_LRS"
+			},
+			"Standard_D8_v3": {
+				"storageAccountType": "Standard_LRS"
+			},
+			"Standard_D16_v3": {
+				"storageAccountType": "Standard_LRS"
+			},
+			"Standard_D32_v3": {
+				"storageAccountType": "Standard_LRS"
+			},
+			"Standard_D64_v3": {
+				"storageAccountType": "Standard_LRS"
+			},
+			"Standard_DS2_v3": {
+				"storageAccountType": "Premium_LRS"
+			},
+			"Standard_DS4_v3": {
+				"storageAccountType": "Premium_LRS"
+			},
+			"Standard_DS8_v3": {
+				"storageAccountType": "Premium_LRS"
+			},
+			"Standard_DS16_v3": {
+				"storageAccountType": "Premium_LRS"
+			},
+			"Standard_DS32_v3": {
+				"storageAccountType": "Premium_LRS"
+			},
+			"Standard_DS64_v3": {
+				"storageAccountType": "Premium_LRS"
+			},
+			"Standard_E2_v3": {
+				"storageAccountType": "Standard_LRS"
+			},
+			"Standard_E4_v3": {
+				"storageAccountType": "Standard_LRS"
+			},
+			"Standard_E8_v3": {
+				"storageAccountType": "Standard_LRS"
+			},
+			"Standard_E16_v3": {
+				"storageAccountType": "Standard_LRS"
+			},
+			"Standard_E32_v3": {
+				"storageAccountType": "Standard_LRS"
+			},
+			"Standard_E64_v3": {
+				"storageAccountType": "Standard_LRS"
+			},
+			"Standard_ES2_v3": {
+				"storageAccountType": "Premium_LRS"
+			},
+			"Standard_ES4_v3": {
+				"storageAccountType": "Premium_LRS"
+			},
+			"Standard_ES8_v3": {
+				"storageAccountType": "Premium_LRS"
+			},
+			"Standard_ES16_v3": {
+				"storageAccountType": "Premium_LRS"
+			},
+			"Standard_ES32_v3": {
+				"storageAccountType": "Premium_LRS"
+			},
+			"Standard_ES64_v3": {
 				"storageAccountType": "Premium_LRS"
 			}
 		}
