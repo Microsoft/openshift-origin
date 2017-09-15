@@ -7,7 +7,7 @@ SUDOUSER=$2
 # Update system to latest packages and install dependencies
 echo $(date) " - Update system to latest packages and install dependencies"
 
-yum -y install wget git net-tools bind-utils iptables-services bridge-utils bash-completion httpd-tools
+yum -y install wget git net-tools bind-utils iptables-services bridge-utils bash-completion kexec-tools sos psacct httpd-tools
 yum -y update --exclude=WALinuxAgent
 
 # Install EPEL repository
@@ -67,14 +67,6 @@ provisioner: kubernetes.io/azure-disk
 parameters:
   storageAccount: ${STORAGEACCOUNT1}
 EOF
-
-# Install Azure CLI
-
-echo $(date) " - Installing Azure CLI"
-
-yum -y --enablerepo=epel install nodejs
-
-npm install -g azure-cli
 
 fi
 
