@@ -4,7 +4,7 @@ echo $(date) " - Starting Script"
 # Update system to latest packages and install dependencies
 echo $(date) " - Update system to latest packages and install dependencies"
 
-yum -y install wget git net-tools bind-utils iptables-services bridge-utils bash-completion
+yum -y install wget git net-tools bind-utils iptables-services bridge-utils bash-completion kexec-tools sos psacct
 yum -y update --exclude=WALinuxAgent
 
 # Install EPEL repository

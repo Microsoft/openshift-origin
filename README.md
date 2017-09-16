@@ -4,10 +4,11 @@ Bookmark [aka.ms/OpenShift](http://aka.ms/OpenShift) for future reference.
 
 For the **OpenShift Container Platform** refer to https://github.com/Microsoft/openshift-container-platform
 
+Change log located in CHANGELOG.md
 
 ## OpenShift Origin with Username / Password
 
-Current template deploys OpenShift Origin 1.5.1. 
+Current template deploys OpenShift Origin 3.6 (1.6). 
 
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FMicrosoft%2Fopenshift-origin%2Fmaster%2Fazuredeploy.json" target="_blank"><img src="http://azuredeploy.net/deploybutton.png"/></a>
 
@@ -22,7 +23,7 @@ This template deploys OpenShift Origin with basic username / password for authen
 |Storage Accounts   	|1 Storage Accounts for Master VMs<br />1 Storage Accounts for Infra VMs<br />2 Storage Accounts for Node VMs<br />1 Storage Account for Private Docker Registry<br />1 Storage Account for Persistent Volume  |
 |Network Security Groups|1 Network Security Group Master VMs<br />1 Network Security Group for Infra VMs<br />1 Network Security Group for Node VMs  |
 |Availability Sets      |1 Availability Set for Master VMs<br />1 Availability Set for Infra VMs<br />1 Availability Set for Node VMs  |
-|Virtual Machines   	|1, 2, or 3 Masters. First Master is used to run Ansible Playbook to install OpenShift<br />1, 2, or 3 Infra nodes<br />User-defined number of Nodes (1 to 30)<br />All VMs include a single attached data disk for Docker thin pool logical volume|
+|Virtual Machines   	|2 or 3 Masters. First Master is used to run Ansible Playbook to install OpenShift<br />2 or 3 Infra nodes<br />User-defined number of Nodes (1 to 30)<br />All VMs include a single attached data disk for Docker thin pool logical volume|
 
 If you have a Red Hat subscription and would like to deploy an OpenShift Container Platform (formerly OpenShift Enterprise) cluster, please visit: https://github.com/Microsoft/openshift-container-platform
 
@@ -30,7 +31,7 @@ If you have a Red Hat subscription and would like to deploy an OpenShift Contain
 
 This template deploys multiple VMs and requires some pre-work before you can successfully deploy the OpenShift Cluster. If you don't get the pre-work done correctly, you will most likely fail to deploy the cluster using this template.  Please read the instructions completely before you proceed. 
 
-This template allows you to choose between CentOS or the On-Demand Red Hat Enterprise Linux image from the Azure Gallery. 
+This template uses CentOS as the base OS Image.  If you want to use the On-Demand Red Hat Enterprise Linux image from the Azure Gallery, you will need to fork this repo and edit the azuredeploy.json file.  The variable is called osImage. 
 >If you use the On-Demand image, there is an hourly charge for using this image.  
 
 ## Prerequisites
@@ -138,13 +139,10 @@ To assign permissions, please follow the instructions from Azure CLI 1.0 Step 2 
 ### azuredeploy.Parameters.json File Explained
 
 1.  _artifactsLocation: The base URL where artifacts required by this template are located. If you are using your own fork of the repo and want the deployment to pick up artifacts from your fork, update this value appropriately (user and branch), for example, change from `https://raw.githubusercontent.com/Microsoft/openshift-origin/master/` to `https://raw.githubusercontent.com/YourUser/openshift-origin/YourBranch/`
-4.  osImage: Select from CentOS (centos) or RHEL (rhel) for the Operating System
 2.  masterVmSize: Size of the Master VM. Select from one of the allowed VM sizes listed in the azuredeploy.json file
 3.  infraVmSize: Size of the Infra VM. Select from one of the allowed VM sizes listed in the azuredeploy.json file
 3.  nodeVmSize: Size of the Node VM. Select from one of the allowed VM sizes listed in the azuredeploy.json file
 5.  openshiftClusterPrefix: Cluster Prefix used to configure hostnames for all nodes - master, infra and nodes. Between 1 and 20 characters
-6.  openshiftMasterPublicIpDnsLabelPrefix: A unique Public DNS name to reference the Master Node by
-7.  infraLbPublicIpDnsLabelPrefix: A unique Public DNS name to reference the Node Load Balancer by.  Used to access deployed applications
 8.  masterInstanceCount: Number of Masters nodes to deploy
 8.  infraInstanceCount: Number of infra nodes to deploy
 9.  nodeInstanceCount: Number of Nodes to deploy
@@ -180,11 +178,6 @@ Monitor deployment via CLI or Portal and get the console URL from outputs of suc
 `https://me-master1.westus2.cloudapp.azure.com:8443/console`
 
 The cluster will use self-signed certificates. Accept the warning and proceed to the login page.
-
-### NOTE
-
-Ensure combination of openshiftMasterPublicIpDnsLabelPrefix, and nodeLbPublicIpDnsLabelPrefix parameters, combined with the deployment location give you globally unique URL for the cluster or deployment will fail at the step of allocating public IPs with fully-qualified-domain-names as above.
-
 
 ### NOTE
 
