@@ -7,6 +7,6 @@ This CHANGELOG.md file will contain the update log for the latest set of updates
 3.  Removed dnslabel parameters and made them variables to simplify deployment.
 4.  Added new D2-64v3, D2s-64sv3, E2-64v3, and E2s-64sv3 VM types.
 5.  Updated prep scripts to include additional documented pre-requisites.
-6.  Removed option to install single master cluster.  Now supports 2 or 3 masters and 2 or 3 infra nodes.
+6.  Removed option to install single master cluster.  Now supports 3 or 5 masters and 2 or 3 infra nodes.
 7.  Configure CentOS to use NetworkManager on eth0 - Thank you to @sozercan for help with this piece!
 
