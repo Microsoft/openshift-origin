@@ -94,9 +94,9 @@
 		"masterInstanceCount": {
 			"type": "int",
 			"defaultValue": 3,
-			"allowedValues": [2, 3],
+			"allowedValues": [3, 5],
 			"metadata": {
-				"description": "Number of OpenShift masters.  1 is non HA and 3 is for HA"
+				"description": "Number of OpenShift masters."
 			}
 		},
 		"infraInstanceCount": {
@@ -104,7 +104,7 @@
 			"defaultValue": 2,
 			"allowedValues": [2, 3],
 			"metadata": {
-				"description": "Number of OpenShift infra nodes.  1 is non HA.  Choose 2 or 3 for HA"
+				"description": "Number of OpenShift infra nodes."
 			}
 		},
 		"nodeInstanceCount": {
