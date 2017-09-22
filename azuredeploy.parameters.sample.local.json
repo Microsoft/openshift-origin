@@ -5,9 +5,6 @@
 		"_artifactsLocation": {
 			"value": "https://raw.githubusercontent.com/Microsoft/openshift-origin/master/"
 		},
-		"osImage": {
-			"value": "centos"
-		},
 		"masterVmSize": {
 			"value": "Standard_DS3_v2"
 		},
@@ -19,12 +16,6 @@
 		},
 		"openshiftClusterPrefix": {
 			"value": "mycluster"
-		},
-		"openshiftMasterPublicIpDnsLabel": {
-			"value": "me-master1"
-		},
-		"infraLbPublicIpDnsLabel": {
-			"value": "me-node1"
 		},
 		"masterInstanceCount": {
 			"value": 1
