@@ -8,7 +8,7 @@ Change log located in CHANGELOG.md
 
 ## OpenShift Origin with Username / Password
 
-Current template deploys OpenShift Origin 3.6 (1.6). 
+Current template deploys OpenShift Origin 3.6 (1.6).
 
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FMicrosoft%2Fopenshift-origin%2Fmaster%2Fazuredeploy.json" target="_blank"><img src="http://azuredeploy.net/deploybutton.png"/></a>
 
@@ -29,9 +29,9 @@ If you have a Red Hat subscription and would like to deploy an OpenShift Contain
 
 ## READ the instructions in its entirety before deploying!
 
-This template deploys multiple VMs and requires some pre-work before you can successfully deploy the OpenShift Cluster. If you don't get the pre-work done correctly, you will most likely fail to deploy the cluster using this template.  Please read the instructions completely before you proceed. 
+This template deploys multiple VMs and requires some pre-work before you can successfully deploy the OpenShift Cluster. If you don't get the pre-work done correctly, you will most likely fail to deploy the cluster using this template.  Please read the instructions completely before you proceed.
 
-This template uses CentOS as the base OS Image.  If you want to use the On-Demand Red Hat Enterprise Linux image from the Azure Gallery, you will need to fork this repo and edit the azuredeploy.json file.  The variable is called osImage. 
+This template uses CentOS as the base OS Image.  If you want to use the On-Demand Red Hat Enterprise Linux image from the Azure Gallery, you will need to fork this repo and edit the azuredeploy.json file.  The variable is called osImage.
 >If you use the On-Demand image, there is an hourly charge for using this image.  
 
 ## Prerequisites
@@ -78,7 +78,7 @@ You will need to create a Key Vault to store your SSH Private Key that will then
 To configure Azure as the Cloud Provider for OpenShift Origin, you will need to create an Azure Active Directory Service Principal.  The easiest way to perform this task is via the Azure CLI.  Below are the steps for doing this.
 
 You will want to create the Resource Group that you will ultimately deploy the OpenShift cluster to prior to completing the following steps.  If you don't, then wait until you initiate the deployment of the cluster before completing **Azure CLI 1.0 Step 2**. If using **Azure CLI 2.0**, complete step 2 to create the Service Principal prior to deploying the cluster and then assign permissions based on **Azure CLI 1.0 Step 2**.
- 
+
 **Azure CLI 1.0**
 
 1. **Create Service Principal**<br/>
@@ -155,8 +155,8 @@ To assign permissions, please follow the instructions from Azure CLI 1.0 Step 2 
 16. keyVaultSecret: The Secret Name you used when creating the Secret (that contains the Private Key)
 18. aadClientId: Azure Active Directory Client ID also known as Application ID for Service Principal
 18. aadClientSecret: Azure Active Directory Client Secret for Service Principal
-17. defaultSubDomainType: This will either be xipio (if you don't have your own domain) or custom if you have your own domain that you would like to use for routing
-18. defaultSubDomain: The wildcard DNS name you would like to use for routing if you selected custom above.  If you selected xipio above, then this field will be ignored
+17. defaultSubDomainType: This will either be nipio (if you don't have your own domain) or custom if you have your own domain that you would like to use for routing
+18. defaultSubDomain: The wildcard DNS name you would like to use for routing if you selected custom above.  If you selected nipio above, then this field will be ignored
 
 ## Deploy Template
 
@@ -197,7 +197,7 @@ You should see a folder named '0' and '1'. In each of these folders, you will se
 ## Post-Deployment Operations
 
 ### Additional OpenShift Configuration Options
- 
+
 You can configure additional settings per the official [OpenShift Origin Documentation](https://docs.openshift.org/latest/welcome/index.html).
 
 Few options you have
@@ -208,7 +208,7 @@ Few options you have
   c. openshiftNodeLoadBalancerFQDN node load balancer<br/>
 2. Get the deployment output data
   a. portal.azure.com -> choose 'Resource groups' select your group select 'Deployments' and there the deployment 'Microsoft.Template'. As output from the deployment it contains information about the openshift console url, ssh command and load balancer url.<br/>
-  b. With the Azure CLI : azure group deployment list &lt;resource group name> 
+  b. With the Azure CLI : azure group deployment list &lt;resource group name>
 3. Add additional users. you can find much detail about this in the openshift.org documentation under 'Cluster Administration' and 'Managing Users'. This installation uses htpasswd as the identity provider. To add more users, ssh in to each master node and execute following command:
    ```sh
    sudo htpasswd /etc/origin/master/htpasswd user1

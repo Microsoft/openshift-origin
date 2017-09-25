@@ -54,7 +54,7 @@
 			"value": "ThisIsYourAzureADServicePrincipalClientSecret"
 		},
 		"defaultSubDomainType": {
-			"value": "xipio"
+			"value": "nipio"
 		},
 		"defaultSubDomain": {
 			"value": "domain-name-all-lowercase-if-custom-used.com"
