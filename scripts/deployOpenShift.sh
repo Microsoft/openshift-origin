@@ -505,17 +505,4 @@ runuser -l $SUDOUSER -c "ansible-playbook ~/setup-azure-node-master.yml"
 runuser -l $SUDOUSER -c "ansible-playbook ~/setup-azure-node.yml"
 runuser -l $SUDOUSER -c "ansible-playbook ~/deletestucknodes.yml"
 
-# Delete postinstall files
-echo $(date) "- Deleting post installation files"
-
-
-rm /home/${SUDOUSER}/addocpuser.yml
-rm /home/${SUDOUSER}/assignclusteradminrights.yml
-rm /home/${SUDOUSER}/dockerregistry.yml
-rm /home/${SUDOUSER}/vars.yml
-rm /home/${SUDOUSER}/setup-azure-master.yml
-rm /home/${SUDOUSER}/setup-azure-node-master.yml
-rm /home/${SUDOUSER}/setup-azure-node.yml
-rm /home/${SUDOUSER}/deletestucknodes.yml
-
 echo $(date) " - Script complete"
