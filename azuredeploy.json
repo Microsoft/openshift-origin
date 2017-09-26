@@ -183,19 +183,19 @@
 		},
 		"defaultSubDomainType": {
 			"type": "string",
-			"defaultValue": "xipio",
+			"defaultValue": "nipio",
 			"allowedValues": [
-				"xipio", "custom"
+				"nipio", "custom"
 			],
 			"metadata": {
-				"description": "Default Subdomain type - xip.io or custom (defined in next parameter)"
+				"description": "Default Subdomain type - nip.io or custom (defined in next parameter)"
 			}
 		},
 		"defaultSubDomain": {
 			"type": "string",
 			"defaultValue": "contoso.com",
 			"metadata": {
-				"description": "Default Subdomain for application routing (Wildcard DNS) - must enter something even if you are using xip.io"
+				"description": "Default Subdomain for application routing (Wildcard DNS) - must enter something even if you are using nip.io"
 			}
 		}
 	},
@@ -215,7 +215,7 @@
 		"newStorageAccountNodeOs": "[concat('nodeos', uniqueString(concat(resourceGroup().id, 'nodeossa')))]",
 		"newStorageAccountNodeData": "[concat('nodedata', uniqueString(concat(resourceGroup().id, 'nodedatasa')))]",
 		"newStorageAccountRegistry": "[concat('registry', uniqueString(concat(resourceGroup().id, 'registry')))]",
-		"newStorageAccountPersistentVolume1": "[concat('pv1sa', uniqueString(concat(resourceGroup().id, 'persistentvolume1')))]", 
+		"newStorageAccountPersistentVolume1": "[concat('pv1sa', uniqueString(concat(resourceGroup().id, 'persistentvolume1')))]",
 		"addressPrefix": "10.0.0.0/8",
 		"masterSubnetPrefix": "10.1.0.0/16",
 		"nodeSubnetPrefix": "10.2.0.0/16",
@@ -225,7 +225,7 @@
 		"infraLbPublicIpDnsLabel": "[concat('infradns', uniqueString(concat(resourceGroup().id, 'infra')))]",
 		"openshiftMasterPublicIpDnsLabel": "[concat('masterdns', uniqueString(concat(resourceGroup().id, 'master')))]",
 		"persistentVolume1Type": "Standard_LRS",
-		
+
 		"masterLoadBalancerName": "[concat(variables('openshiftMasterHostname'), 'lb')]",
 		"masterPublicIpAddressId": "[resourceId('Microsoft.Network/publicIPAddresses', variables('openshiftMasterPublicIpDnsLabel'))]",
 		"masterLbId": "[resourceId('Microsoft.Network/loadBalancers', variables('masterLoadBalancerName'))]",
@@ -233,7 +233,7 @@
 		"masterLbBackendPoolId": "[concat(variables('masterLbId'),'/backendAddressPools/loadBalancerBackend')]",
 		"masterLbHttpProbeId": "[concat(variables('masterLbId'),'/probes/httpProbe')]",
 		"masterLb8443ProbeId": "[concat(variables('masterLbId'),'/probes/8443Probe')]",
-		
+
 		"infraLoadBalancerName": "[concat(variables('openshiftInfraHostname'), 'lb')]",
 		"infraPublicIpAddressId": "[resourceId('Microsoft.Network/publicIPAddresses', variables('infraLbPublicIpDnsLabel'))]",
 		"infraLbId": "[resourceId('Microsoft.Network/loadBalancers', variables('infraLoadBalancerName'))]",
@@ -242,12 +242,12 @@
 		"infraLbHttpProbeId": "[concat(variables('infraLbId'),'/probes/httpProbe')]",
 		"infraLbHttpsProbeId": "[concat(variables('infraLbId'),'/probes/httpsProbe')]",
 		"osImage": "centos",
-		"centos": { 
-			"publisher": "Openlogic", 
-			"offer": "CentOS", 
-			"sku": "7.3", 
-			"version": "latest" 
-		}, 
+		"centos": {
+			"publisher": "Openlogic",
+			"offer": "CentOS",
+			"sku": "7.3",
+			"version": "latest"
+		},
 		"rhel": {
 			"publisher": "RedHat",
 			"offer": "RHEL",
@@ -828,7 +828,7 @@
 					}
 				}]
 			}
-		},	
+		},
 		{
 			"apiVersion": "[variables('apiVersionNetwork')]",
 			"type": "Microsoft.Network/loadBalancers/inboundNatRules",
@@ -850,7 +850,7 @@
 				"backendPort": 22,
 				"enableFloatingIP": false
 			}
-		},		
+		},
 		{
 			"type": "Microsoft.Network/loadBalancers",
 			"name": "[variables('infraLoadBalancerName')]",
@@ -1372,8 +1372,8 @@
 					"aadClientSecret": {
 						"value": "[parameters('aadClientSecret')]"
 					},
-					"xipioDomain": {
-						"value": "[concat(reference(variables('infraLbPublicIpDnsLabel')).ipAddress, '.xip.io')]"
+					"nipioDomain": {
+						"value": "[concat(reference(variables('infraLbPublicIpDnsLabel')).ipAddress, '.nip.io')]"
 					},
 					"customDomain": {
 						"value": "[parameters('defaultSubDomain')]"

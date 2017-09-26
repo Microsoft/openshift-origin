@@ -126,10 +126,10 @@
 				"description": "Azure AD Client Secret"
 			}
 		},
-		"xipioDomain": {
+		"nipioDomain": {
 			"type": "string",
 			"metadata": {
-				"description": "Xip.io Subdomain for application routing"
+				"description": "Nip.io Subdomain for application routing"
 			}
 		},
 		"customDomain": {
