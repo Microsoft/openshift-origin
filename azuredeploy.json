@@ -1239,7 +1239,7 @@
 					]
 				},
 				"protectedSettings": {
-					"commandToExecute": "[concat('bash ', variables('masterPrepScriptFileName'), ' ', variables('newStorageAccountPersistentVolume1'), ' ', parameters('adminUsername'))]"
+					"commandToExecute": "[concat('bash ', variables('masterPrepScriptFileName'), ' ', variables('newStorageAccountPersistentVolume1'), ' ', variables('location') , ' ', parameters('adminUsername'))]"
 				}
 			}
 		}, {
