@@ -1,5 +1,11 @@
 This CHANGELOG.md file will contain the update log for the latest set of updates to the templates
 
+# UPDATE - December 21, 2017
+
+1.  Created branch for release-3.6.
+2.  Updated git clone to branch release-3.6.
+
+
 # UPDATES for Release 3.6 - September 15, 2017
 
 1.  Removed option to select between CentOS and RHEL.  This template uses CentOS.  This can be changed by forking the repo and changing the variable named osImage in azuredeploy.json
