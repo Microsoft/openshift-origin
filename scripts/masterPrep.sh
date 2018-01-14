@@ -2,7 +2,8 @@
 echo $(date) " - Starting Script"
 
 STORAGEACCOUNT1=$1
-SUDOUSER=$2
+LOCATION=$2
+SUDOUSER=$3
 
 # Update system to latest packages and install dependencies
 echo $(date) " - Update system to latest packages and install dependencies"
@@ -66,6 +67,7 @@ metadata:
 provisioner: kubernetes.io/azure-disk
 parameters:
   storageAccount: ${STORAGEACCOUNT1}
+  location: ${LOCATION}
 EOF
 
 fi
