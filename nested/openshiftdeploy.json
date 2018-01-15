@@ -14,6 +14,18 @@
 				"description": "API version for compute resources"
 			}
 		},
+		"openshiftDeploymentScriptUrl": {
+			"type": "string",
+			"metadata": {
+				"description": "Bastion prep script Url"
+			}
+		},
+		"openshiftDeploymentScriptFileName": {
+			"type": "string",
+			"metadata": {
+				"description": "Bastion prep script file name"
+			}
+		},
 		"newStorageAccountRegistry": {
 			"type": "string",
 			"minLength": 1,
@@ -26,20 +38,6 @@
 			"minLength": 1,
 			"metadata": {
 				"description": "Storage Account Key for Docker Registry"
-			}
-		},
-		"newStorageAccountPersistentVolume1": {
-			"type": "string",
-			"minLength": 1,
-			"metadata": {
-				"description": "Storage Account for Persistent Volumes"
-			}
-		},
-		"newStorageAccountPV1Key": {
-			"type": "string",
-			"minLength": 1,
-			"metadata": {
-				"description": "Storage Account Key for Persistent Volumes"
 			}
 		},
 		"openshiftMasterHostname": {
@@ -98,6 +96,12 @@
 				"description": "Number of OpenShift nodes"
 			}
 		},
+		"storageKind": {
+			"type": "string",
+			"metadata": {
+				"description": "Managed or unmanaged disk"
+			}
+		},
 		"adminUsername": {
 			"type": "string",
 			"minLength": 1,
@@ -110,6 +114,30 @@
 			"minLength": 1,
 			"metadata": {
 				"description": "Administrator password for OpenShift Console"
+			}
+		},
+		"enableMetrics": {
+			"type": "string",
+			"metadata": {
+				"description": "Enable OpenShift Metrics: true or false"
+			}
+		},
+		"enableLogging": {
+			"type": "string",
+			"metadata": {
+				"description": "Enable OpenShift Logging: true or false"
+			}
+		},
+		"enableCockpit": {
+			"type": "string",
+			"metadata": {
+				"description": "Enable Cockpit: true or false"
+			}
+		},
+		"enableAzure": {
+			"type": "string",
+			"metadata": {
+				"description": "Enable Azure: true or false"
 			}
 		},
 		"aadClientId": {
@@ -144,6 +172,12 @@
 				"description": "Subdomain chosen for application routing"
 			}
 		},
+		"redHatTags": {
+			"type": "object",
+			"metadata": {
+				"description": "Red Hat Tags"
+			}
+		},
 		"sshPrivateKey": {
 			"type": "securestring",
 			"minLength": 1,
@@ -158,8 +192,6 @@
 		"subscriptionId": "[subscription().subscriptionId]",
 		"location": "[resourceGroup().location]",
 		"resourceGroupName": "[resourceGroup().name]",
-		"openshiftDeploymentScriptUrl": "[concat(parameters('_artifactsLocation'), 'scripts/deployOpenShift.sh')]",
-		"openshiftDeploymentScriptFileName": "deployOpenShift.sh"
 	},
 	"resources": [{
 		"type": "Microsoft.Compute/virtualMachines/extensions",
@@ -167,7 +199,9 @@
 		"location": "[resourceGroup().location]",
 		"apiVersion": "[parameters('apiVersionCompute')]",
 		"tags": {
-			"displayName": "DeployOpenShift"
+			"displayName": "DeployOpenShift",
+			"provider": "[parameters('redHatTags').provider]",
+			"app": "[parameters('redHatTags').app]"
 		},
 		"properties": {
 			"publisher": "Microsoft.Azure.Extensions",
@@ -176,11 +210,11 @@
 			"autoUpgradeMinorVersion": true,
 			"settings": {
 				"fileUris": [
-					"[variables('openshiftDeploymentScriptUrl')]"
+					"[parameters('openshiftDeploymentScriptUrl')]"
 				]
 			},
 			"protectedSettings": {
-				"commandToExecute": "[concat('bash ', variables('openshiftDeploymentScriptFileName'), ' \"', parameters('adminUsername'), '\" ', variables('singlequote'), parameters('openshiftPassword'), variables('singlequote'), ' \"', parameters('sshPrivateKey'), '\" \"', parameters('openshiftMasterHostname'), '\" \"', parameters('openshiftMasterPublicIpFqdn'), '\" \"', parameters('openshiftMasterPublicIpAddress'), '\" \"', parameters('openshiftInfraHostname'), '\" \"', parameters('openshiftNodeHostname'), '\" \"', parameters('nodeInstanceCount'), '\" \"', parameters('infraInstanceCount'), '\" \"', parameters('MasterInstanceCount'), '\" \"', parameters(parameters('subDomainChosen')), '\" \"', parameters('newStorageAccountRegistry'), '\" ', variables('singlequote'), parameters('newStorageAccountKey'), variables('singlequote'), ' ', variables('singlequote'), variables('tenantId'), variables('singlequote'), ' ', variables('singlequote'), variables('subscriptionId'), variables('singlequote'), ' ', variables('singlequote'), parameters('aadClientId'), variables('singlequote'), ' ', variables('singlequote'), parameters('aadClientSecret'), variables('singlequote'), ' ', variables('singlequote'), variables('resourceGroupName'), variables('singlequote'), ' ', variables('singlequote'), variables('location'), variables('singlequote'), ' ', variables('singlequote'), parameters('newStorageAccountPersistentVolume1'), variables('singlequote'), ' ', variables('singlequote'), parameters('newStorageAccountPV1Key'), variables('singlequote'))]"
+				"commandToExecute": "[concat('bash ', parameters('openshiftDeploymentScriptFileName'), ' \"', parameters('adminUsername'), '\" ', variables('singlequote'), parameters('openshiftPassword'), variables('singlequote'), ' \"', parameters('sshPrivateKey'), '\" \"', parameters('openshiftMasterHostname'), '\" \"', parameters('openshiftMasterPublicIpFqdn'), '\" \"', parameters('openshiftMasterPublicIpAddress'), '\" \"', parameters('openshiftInfraHostname'), '\" \"', parameters('openshiftNodeHostname'), '\" \"', parameters('nodeInstanceCount'), '\" \"', parameters('infraInstanceCount'), '\" \"', parameters('MasterInstanceCount'), '\" \"', parameters(parameters('subDomainChosen')), '\" \"', parameters('newStorageAccountRegistry'), '\" ', variables('singlequote'), parameters('newStorageAccountKey'), variables('singlequote'), ' ', variables('singlequote'), variables('tenantId'), variables('singlequote'), ' ', variables('singlequote'), variables('subscriptionId'), variables('singlequote'), ' ', variables('singlequote'), parameters('aadClientId'), variables('singlequote'), ' ', variables('singlequote'), parameters('aadClientSecret'), variables('singlequote'), ' ', variables('singlequote'), variables('resourceGroupName'), variables('singlequote'), ' ', variables('singlequote'), variables('location'), variables('singlequote'), ' ', variables('singlequote'), parameters('newStorageAccountPersistentVolume1'), variables('singlequote'), ' ', variables('singlequote'), parameters('newStorageAccountPV1Key'), variables('singlequote'))]"
 			}
 		}
 	}],
