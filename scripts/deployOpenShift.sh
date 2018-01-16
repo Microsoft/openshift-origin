@@ -407,7 +407,7 @@ openshift_use_dnsmasq=True
 openshift_master_default_subdomain=$ROUTING
 openshift_override_hostname_check=true
 osm_use_cockpit=false
-#os_sdn_network_plugin_name='redhat/openshift-ovs-multitenant'
+os_sdn_network_plugin_name='redhat/openshift-ovs-multitenant'
 #console_port=443
 openshift_cloudprovider_kind=azure
 osm_default_node_selector='type=app'
@@ -424,8 +424,14 @@ openshift_master_cluster_public_vip=$MASTERPUBLICIPADDRESS
 # Enable HTPasswdPasswordIdentityProvider
 openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
 
-# Deploy Service Catalog
-#openshift_enable_service_catalog=false
+# Enable service catalog
+openshift_enable_service_catalog=false
+# Enable template service broker (requires service catalog to be enabled, above)
+template_service_broker_install=false
+# Configure one of more namespaces whose templates will be served by the TSB
+openshift_template_service_broker_namespaces=['openshift']
+# Disable the OpenShift SDN plugin
+openshift_use_openshift_sdn=true
 
 # Setup metrics
 openshift_metrics_install_metrics=false
@@ -613,7 +619,19 @@ then
 	echo $(date) "- Rebooting cluster to complete installation"
 	
 	oc label nodes --all logging-infra-fluentd=true logging=true
-	runuser -l $SUDOUSER -c "ansible-playbook ~/reboot-nodes.yml"
+	
+	sleep 20
+
+## restart the required service 
+
+	echo $(date) "- Restarting ovs   "
+
+	runuser -l $SUDOUSER -c  "ansible all -b  -m service -a 'name=openvswitch state=restarted' "
+
+	echo $(date) "- Restarting origin nodes after 20 seconds    "
+	sleep 20
+
+	runuser -l $SUDOUSER -c  "ansible nodes -b  -m service -a 'name=origin-node state=restarted' "
 
 fi
 
