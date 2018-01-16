@@ -616,15 +616,12 @@ then
 	   exit 10
 	fi
 
-	echo $(date) "- Rebooting cluster to complete installation"
+	echo $(date) "- Restarting OVS to complete installation"
 	
+	echo $(date) "- Sleep for 20"
+	
+	sleep 20	
 	oc label nodes --all logging-infra-fluentd=true logging=true
-	
-	sleep 20
-
-## restart the required service 
-
-	echo $(date) "- Restarting ovs   "
 
 	runuser -l $SUDOUSER -c  "ansible all -b  -m service -a 'name=openvswitch state=restarted' "
 
