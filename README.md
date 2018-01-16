@@ -43,9 +43,6 @@ Additional documentation for deploying OpenShift in Azure can be found here: htt
 
 This template deploys multiple VMs and requires some pre-work before you can successfully deploy the OpenShift Cluster. If you don't get the pre-work done correctly, you will most likely fail to deploy the cluster using this template.  Please read the instructions completely before you proceed.
 
-This template uses CentOS as the base OS Image.  If you want to use the On-Demand Red Hat Enterprise Linux image from the Azure Gallery, you will need to fork this repo and edit the azuredeploy.json file.  The variable is called osImage.
->If you use the On-Demand image, there is an hourly charge for using this image.  
-
 ## Prerequisites
 
 ### Generate SSH Keys
