@@ -1,11 +1,6 @@
 #!/bin/bash
+
 echo $(date) " - Starting Script"
-
-# Update system to latest packages and install dependencies
-echo $(date) " - Update system to latest packages and install dependencies"
-
-yum -y install wget git net-tools bind-utils iptables-services bridge-utils bash-completion kexec-tools sos psacct
-yum -y update --exclude=WALinuxAgent
 
 # Install EPEL repository
 echo $(date) " - Installing EPEL"
@@ -13,6 +8,25 @@ echo $(date) " - Installing EPEL"
 yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 
 sed -i -e "s/^enabled=1/enabled=0/" /etc/yum.repos.d/epel.repo
+
+# Update system to latest packages and install dependencies
+echo $(date) " - Update system to latest packages and install dependencies"
+
+yum -y install wget git net-tools bind-utils iptables-services bridge-utils bash-completion kexec-tools sos psacct
+yum -y install cloud-utils-growpart.noarch
+yum -y update --exclude=WALinuxAgent
+
+# Grow Root File System
+echo $(date) " - Grow Root FS"
+
+rootdev=`findmnt --target / -o SOURCE -n`
+rootdrivename=`lsblk -no pkname $rootdev`
+rootdrive="/dev/"$rootdrivename
+majorminor=`lsblk  $rootdev -o MAJ:MIN | tail -1`
+part_number=${majorminor#*:}
+
+growpart $rootdrive $part_number -u on
+xfs_growfs $rootdev
 
 # Install Docker 1.12.x
 echo $(date) " - Installing Docker 1.12.x"

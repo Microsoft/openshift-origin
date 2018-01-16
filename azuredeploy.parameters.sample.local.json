@@ -14,6 +14,9 @@
 		"nodeVmSize": {
 			"value": "Standard_DS3_v2"
 		},
+		"storageKind": {
+			"value": "managed"
+		},
 		"openshiftClusterPrefix": {
 			"value": "mycluster"
 		},
@@ -35,6 +38,15 @@
 		"openshiftPassword": {
 			"value": "ThisIsYourSampleSecret!ShouldStayLocal!"
 		},
+		"enableMetrics": {
+			"value": "false"
+		},
+		"enableLogging": {
+			"value": "false"
+		},
+		"enableCockpit": {
+			"value": "false"
+		},
 		"sshPublicKey": {
 			"value": "ssh-rsa AAAAB3...Public...Key...You...Created...In...Prep...Steps...swXg5szN"
 		},
@@ -46,6 +58,9 @@
 		},
 		"keyVaultSecret": {
 			"value": "OpenShiftPK1"
+		},
+		"enableAzure": {
+			"value": "true"
 		},
 		"aadClientId": {
 			"value": "ThisIsYourAzureADServicePrincipalClientID"

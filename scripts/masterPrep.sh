@@ -1,15 +1,9 @@
 #!/bin/bash
 echo $(date) " - Starting Script"
 
-STORAGEACCOUNT1=$1
-LOCATION=$2
-SUDOUSER=$3
-
-# Update system to latest packages and install dependencies
-echo $(date) " - Update system to latest packages and install dependencies"
-
-yum -y install wget git net-tools bind-utils iptables-services bridge-utils bash-completion kexec-tools sos psacct httpd-tools
-yum -y update --exclude=WALinuxAgent
+STORAGEACCOUNT=$1
+SUDOUSER=$2
+LOCATION=$3
 
 # Install EPEL repository
 echo $(date) " - Installing EPEL"
@@ -18,6 +12,13 @@ yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarc
 
 sed -i -e "s/^enabled=1/enabled=0/" /etc/yum.repos.d/epel.repo
 
+# Update system to latest packages and install dependencies
+echo $(date) " - Update system to latest packages and install dependencies"
+
+yum -y install wget git net-tools bind-utils iptables-services bridge-utils bash-completion kexec-tools sos psacct httpd-tools
+yum -y install cloud-utils-growpart.noarch
+yum -y update --exclude=WALinuxAgent
+
 # Only install Ansible and pyOpenSSL on Master-0 Node
 
 if hostname -f|grep -- "-0" >/dev/null
@@ -25,6 +26,18 @@ then
    echo $(date) " - Installing Ansible and pyOpenSSL"
    yum -y --enablerepo=epel install ansible pyOpenSSL
 fi
+
+# Grow Root File System
+echo $(date) " - Grow Root FS"
+
+rootdev=`findmnt --target / -o SOURCE -n`
+rootdrivename=`lsblk -no pkname $rootdev`
+rootdrive="/dev/"$rootdrivename
+majorminor=`lsblk  $rootdev -o MAJ:MIN | tail -1`
+part_number=${majorminor#*:}
+
+growpart $rootdrive $part_number -u on
+xfs_growfs $rootdev
 
 # Install Docker 1.12.x
 echo $(date) " - Installing Docker 1.12.x"
@@ -57,17 +70,31 @@ systemctl start docker
 
 if hostname -f|grep -- "-0" >/dev/null
 then
-cat <<EOF > /home/${SUDOUSER}/scgeneric1.yml
+cat <<EOF > /home/${SUDOUSER}/scunmanaged.yml
 kind: StorageClass
-apiVersion: storage.k8s.io/v1beta1
+apiVersion: storage.k8s.io/v1
 metadata:
   name: generic
   annotations:
-    storageclass.beta.kubernetes.io/is-default-class: "true"
+    storageclass.kubernetes.io/is-default-class: "true"
 provisioner: kubernetes.io/azure-disk
 parameters:
-  storageAccount: ${STORAGEACCOUNT1}
   location: ${LOCATION}
+  storageAccount: ${STORAGEACCOUNT}
+EOF
+
+cat <<EOF > /home/${SUDOUSER}/scmanaged.yml
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: generic
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+provisioner: kubernetes.io/azure-disk
+parameters:
+  kind: managed
+  location: ${LOCATION}
+  storageaccounttype: Premium_LRS
 EOF
 
 fi

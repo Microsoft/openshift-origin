@@ -50,12 +50,6 @@
 				"description": "Name of Availibility Set"
 			}
 		},
-		"osImage": {
-			"type": "string",
-			"metadata": {
-				"description": "Image Reference - CentOS or RHEL"
-			}
-		},
 		"hostname": {
 			"type": "string",
 			"minLength": 1,
@@ -63,48 +57,124 @@
 				"description": "VM Hostname"
 			}
 		},
+		"unmanagedOsDiskUri": {
+			"type": "string",
+			"metadata": {
+				"description": "Unmanaged OS disk uri"
+			}
+		},
+		"unmanagedDataDiskUri": {
+			"type": "string",
+			"metadata": {
+				"description": "Unmanaged data disk uri"
+			}
+		},
+		"role": {
+			"type": "string",
+			"metadata": {
+				"description": "VM Role for tag"
+			}
+		},
+		"vmStorageType": {
+			"type": "string",
+			"metadata": {
+				"description": "VM Storage Type"
+			}
+		},
+		"storageKind": {
+			"type": "string",
+			"metadata": {
+				"description": "Managed or Unmanaged disk"
+			}
+		},
 		"newStorageAccountOs": {
 			"type": "string",
-			"minLength": 1,
 			"metadata": {
-				"description": "Storage Account for OS Disk"
+				"description": "Storage Account for OS disk"
 			}
 		},
 		"newStorageAccountData": {
 			"type": "string",
-			"minLength": 1,
 			"metadata": {
-				"description": "Storage Account for Data Disk"
+				"description": "Storage Account for data disk"
+			}
+		},
+		"diagStorageAccount": {
+			"type": "string",
+			"metadata": {
+				"description": "Diagnostics Storage Account"
 			}
 		},
 		"apiVersionStorage": {
 			"type": "string",
-			"minLength": 1,
 			"metadata": {
 				"description": "Storage API Version"
 			}
 		},
 		"apiVersionCompute": {
 			"type": "string",
-			"minLength": 1,
 			"metadata": {
 				"description": "Compute API Version"
+			}
+		},
+		"imageReference": {
+			"type": "object",
+			"metadata": {
+				"description": "Image Reference"
+			}
+		},
+		"redHatTags": {
+			"type": "object",
+			"metadata": {
+				"description": "Red Hat Tags"
 			}
 		}
 	},
 	"variables": {
-		"centos": { 
-			"publisher": "Openlogic", 
-			"offer": "CentOS", 
-			"sku": "7.3", 
-			"version": "latest" 
-		}, 
-		"rhel": {
-			"publisher": "RedHat",
-			"offer": "RHEL",
-			"sku": "7-RAW",
-			"version": "latest"
+		"managedStorageProfile": {
+			"imageReference": "[parameters('imageReference')]",
+			"osDisk": {
+				"name": "[concat(parameters('hostName'), '-osdisk')]",
+				"managedDisk": {
+					"storageAccountType": "[parameters('vmStorageType')]"
+				},
+				"caching": "ReadWrite",
+				"createOption": "FromImage",
+				"diskSizeGB": 64,
+				"osType": "Linux"
+			},
+			"dataDisks": [{
+				"name": "[concat(parameters('hostName'), '-docker-pool')]",
+				"diskSizeGB": "[parameters('dataDiskSize')]",
+				"lun": 0,
+				"managedDisk": {
+					"storageAccountType": "[parameters('vmStorageType')]"
+				},
+				"createOption": "Empty"
+			}]
 		},
+		"unmanagedStorageProfile": {
+			"imageReference": "[parameters('imageReference')]",
+			"osDisk": {
+				"name": "[concat(parameters('hostName'), '-osdisk')]",
+				"vhd": {
+					"uri": "[concat(parameters('unmanagedOsDiskUri'), 'vhds/', parameters('hostname'), '-osdisk.vhd')]"
+				},
+				"caching": "ReadWrite",
+				"createOption": "FromImage",
+				"diskSizeGB": 64
+			},
+			"dataDisks": [{
+				"name": "[concat(parameters('hostname'), '-docker-pool')]",
+				"diskSizeGB": "[parameters('dataDiskSize')]",
+				"lun": 0,
+				"vhd": {
+					"uri": "[concat(parameters('unmanagedDataDiskUri'), 'vhds/', parameters('hostname'), '-docker-pool.vhd')]"
+				},
+				"createOption": "Empty"
+			}]
+		},
+		"storageProfile": "[concat(parameters('storageKind'), 'StorageProfile')]"
 	},
 	"resources": [{
 		"type": "Microsoft.Compute/virtualMachines",
@@ -112,7 +182,9 @@
 		"location": "[parameters('location')]",
 		"apiVersion": "[parameters('apiVersionCompute')]",
 		"tags": {
-			"displayName": "[concat(parameters('hostname'), ' VM Creation')]"
+			"Role": "[parameters('role')]",
+			"provider": "[parameters('redHatTags').provider]",
+			"app": "[parameters('redHatTags').app]"
 		},
 		"properties": {
 			"availabilitySet": {
@@ -134,30 +206,17 @@
 					}
 				}
 			},
-			"storageProfile": {
-				"imageReference": "[variables(parameters('osImage'))]",
-				"osDisk": {
-					"name": "[concat(parameters('hostname'), 'osdisk')]",
-					"vhd": {
-						"uri": "[concat(concat(reference(resourceId(resourceGroup().name, 'Microsoft.Storage/storageAccounts', parameters('newStorageAccountOs')), parameters('apiVersionStorage')).primaryEndpoints['blob'], 'vhds/'), parameters('hostname'), '.vhd')]"
-					},
-					"caching": "ReadWrite",
-					"createOption": "FromImage"
-				},
-				"dataDisks": [{
-					"name": "[concat(parameters('hostname'), '-docker-pool')]",
-					"diskSizeGB": "[parameters('dataDiskSize')]",
-					"lun": 0,
-					"vhd": {
-						"uri": "[concat(concat(reference(resourceId(resourceGroup().name, 'Microsoft.Storage/storageAccounts', parameters('newStorageAccountData')), parameters('apiVersionStorage')).primaryEndpoints['blob'], 'vhds/'), parameters('hostname'), '-docker-pool.vhd')]"
-					},
-					"createOption": "Empty"
-				}]
-			},
+			"storageProfile": "[variables(variables('storageProfile'))]",
 			"networkProfile": {
 				"networkInterfaces": [{
 					"id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('hostname'), '-nic'))]"
 				}]
+			},
+			"diagnosticsProfile": {
+				"bootDiagnostics": {
+					"enabled": true,
+					"storageUri": "[concat(concat(reference(resourceId(resourceGroup().name, 'Microsoft.Storage/storageAccounts', parameters('diagStorageAccount')), parameters('apiVersionStorage')).primaryEndpoints['blob']))]"
+				}
 			}
 		}
 	}],
