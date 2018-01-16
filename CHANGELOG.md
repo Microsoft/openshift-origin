@@ -1,5 +1,14 @@
 This CHANGELOG.md file will contain the update log for the latest set of updates to the templates
 
+# UPDATES for Origin 3.7 - January 16, 2018
+
+1.  Add support for managed and unmanaged disks.
+2.  Update Azure Cloud Provider setup playbooks and configuration.
+3.  Provide option to enable metrics, logging, Cockpit and Azure Cloud Provider.
+4.  Include additional data disk sizes.
+5.  General cleanup.
+
+
 # UPDATE - December 21, 2017
 
 1.  Created branch for release-3.6.

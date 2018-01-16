@@ -1,26 +1,34 @@
 # OpenShift Origin Deployment Template
 
+## NOTE: Structural change to Repo
+
+The master branch will now contain the most current release of OpenShift Origin with experimental items.  This may cause instability but will include new things or try new things.
+
+We will now have branches for the stable releases:
+- Release-3.6
+- Release-3.7
+- etc.
+
 Bookmark [aka.ms/OpenShift](http://aka.ms/OpenShift) for future reference.
 
 For the **OpenShift Container Platform** refer to https://github.com/Microsoft/openshift-container-platform
 
 Change log located in CHANGELOG.md
 
-## OpenShift Origin with Username / Password
+## OpenShift Origin 3.7 with Username / Password
 
-Current template (branch release-3.6) deploys OpenShift Origin 3.6 (1.6).
+Currently, there is an issue when enabling the Azure Cloud Provider.  The cluster works fine with the exception that the Service Catalog does not display all templates.  The workaround at this time is to select from the openshift project to view all original templates.  We have a bugzilla bug open with Red Hat and will update the templates once the solution is available.
 
-<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FMicrosoft%2Fopenshift-origin%2Frelease-3.6%2Fazuredeploy.json" target="_blank"><img src="http://azuredeploy.net/deploybutton.png"/></a>
-
-This template deploys OpenShift Origin with basic username / password for authentication to OpenShift. You can select to use either CentOS or RHEL for the OS. It includes the following resources:
+This template deploys OpenShift Origin with basic username / password for authentication to OpenShift. This uses CentOS and includes the following resources:
 
 |Resource           |Properties                                                                                                                          |
 |-------------------|------------------------------------------------------------------------------------------------------------------------------------|
 |Virtual Network   		|**Address prefix:** 10.0.0.0/8<br />**Master subnet:** 10.1.0.0/16<br />**Node subnet:** 10.2.0.0/16                      |
-|Master Load Balancer	|1 probe and 1 rule for TCP 8443 <br/> NAT rules for SSH on Ports 2200-220X                                           |
-|Infra Load Balancer	|2 probes and 2 rules for TCP 80, and TCP 443 									                                             |
+|Master Load Balancer	|2 probes and 2 rules for TCP 8443 and TCP 9090 <br/> NAT rules for SSH on Ports 2200-220X                                           |
+|Infra Load Balancer	|3 probes and 3 rules for TCP 80, TCP 443 and TCP 9090 									                                             |
 |Public IP Addresses	|OpenShift Master public IP attached to Master Load Balancer<br />OpenShift Router public IP attached to Infra Load Balancer            |
-|Storage Accounts   	|1 Storage Accounts for Master VMs<br />1 Storage Accounts for Infra VMs<br />2 Storage Accounts for Node VMs<br />1 Storage Account for Private Docker Registry<br />1 Storage Account for Persistent Volume  |
+|Storage Accounts <br />Unmanaged Disks  	|1 Storage Account for Master VMs <br />1 Storage Account for Infra VMs<br />2 Storage Accounts for Node VMs<br />2 Storage Accounts for Diagnostics Logs <br />1 Storage Account for Private Docker Registry<br />1 Storage Account for Persistent Volumes  |
+|Storage Accounts <br />Managed Disks      |2 Storage Accounts for Diagnostics Logs <br />1 Storage Account for Private Docker Registry |
 |Network Security Groups|1 Network Security Group Master VMs<br />1 Network Security Group for Infra VMs<br />1 Network Security Group for Node VMs  |
 |Availability Sets      |1 Availability Set for Master VMs<br />1 Availability Set for Infra VMs<br />1 Availability Set for Node VMs  |
 |Virtual Machines   	|3 or 5 Masters. First Master is used to run Ansible Playbook to install OpenShift<br />2 or 3 Infra nodes<br />User-defined number of Nodes (1 to 30)<br />All VMs include a single attached data disk for Docker thin pool logical volume|
@@ -28,6 +36,8 @@ This template deploys OpenShift Origin with basic username / password for authen
 If you have a Red Hat subscription and would like to deploy an OpenShift Container Platform (formerly OpenShift Enterprise) cluster, please visit: https://github.com/Microsoft/openshift-container-platform
 
 ## READ the instructions in its entirety before deploying!
+
+Additional documentation for deploying OpenShift in Azure can be found here: https://docs.microsoft.com/en-us/azure/virtual-machines/linux/openshift-get-started
 
 This template deploys multiple VMs and requires some pre-work before you can successfully deploy the OpenShift Cluster. If you don't get the pre-work done correctly, you will most likely fail to deploy the cluster using this template.  Please read the instructions completely before you proceed.
 
@@ -55,17 +65,7 @@ You will need to create a Key Vault to store your SSH Private Key that will then
   d.  Create Secret: Set-AzureKeyVaultSecret -Name 'SecretName' -SecretValue $securesecret -VaultName 'KeyVaultName'<br/>
   e.  Enable the Key Vault for Template Deployments: Set-AzureRmKeyVaultAccessPolicy -VaultName 'KeyVaultName' -ResourceGroupName 'ResourceGroupName' -EnabledForTemplateDeployment
 
-2. **Create Key Vault using Azure CLI 1.0**<br/>
-  a.  Create new Resource Group: azure group create \<name\> \<location\><br/>
-         Ex: `azure group create ResourceGroupName 'East US'`<br/>
-  b.  Create Key Vault: azure keyvault create -u \<vault-name\> -g \<resource-group\> -l \<location\><br/>
-         Ex: `azure keyvault create -u KeyVaultName -g ResourceGroupName -l 'East US'`<br/>
-  c.  Create Secret: azure keyvault secret set -u \<vault-name\> -s \<secret-name\> --file \<private-key-file-name\><br/>
-         Ex: `azure keyvault secret set -u KeyVaultName -s SecretName --file ~/.ssh/id_rsa`<br/>
-  d.  Enable the Keyvvault for Template Deployment: azure keyvault set-policy -u \<vault-name\> --enabled-for-template-deployment true<br/>
-         Ex: `azure keyvault set-policy -u KeyVaultName --enabled-for-template-deployment true`<br/>
-
-3. **Create Key Vault using Azure CLI 2.0**<br/>
+2. **Create Key Vault using Azure CLI 2.0**<br/>
   a.  Create new Resource Group: az group create -n \<name\> -l \<location\><br/>
          Ex: `az group create -n ResourceGroupName -l 'East US'`<br/>
   b.  Create Key Vault: az keyvault create -n \<vault-name\> -g \<resource-group\> -l \<location\> --enabled-for-template-deployment true<br/>
@@ -75,49 +75,24 @@ You will need to create a Key Vault to store your SSH Private Key that will then
 
 ### Generate Azure Active Directory (AAD) Service Principal
 
-To configure Azure as the Cloud Provider for OpenShift Origin, you will need to create an Azure Active Directory Service Principal.  The easiest way to perform this task is via the Azure CLI.  Below are the steps for doing this.
+To configure Azure as the Cloud Provider for OpenShift Container Platform, you will need to create an Azure Active Directory Service Principal.  The easiest way to perform this task is via the Azure CLI.  Below are the steps for doing this.
 
-You will want to create the Resource Group that you will ultimately deploy the OpenShift cluster to prior to completing the following steps.  If you don't, then wait until you initiate the deployment of the cluster before completing **Azure CLI 1.0 Step 2**. If using **Azure CLI 2.0**, complete step 2 to create the Service Principal prior to deploying the cluster and then assign permissions based on **Azure CLI 1.0 Step 2**.
-
-**Azure CLI 1.0**
-
-1. **Create Service Principal**<br/>
-  a.  azure ad sp create -n \<friendly name\> -p \<password\> --home-page \<URL\> --identifier-uris \<URL\><br/>
-      Ex: `azure ad sp create -n openshiftcloudprovider -p Pass@word1 --home-page http://myhomepage --identifier-uris http://myhomepage`
-
-The entries for --home-page and --identifier-uris is not important for this use case so they do not have to be valid links.
-You will get an output similar to this
-
-```
-info:    Executing command ad sp create
-+ Creating application openshift demo cloud provider
-+ Creating service principal for application 198c4803-1236-4c3f-ad90-46e5f3b4cd2a
-data:    Object Id:               00419334-174b-41e8-9b83-9b5011d8d352
-data:    Display Name:            openshiftcloudprovider
-data:    Service Principal Names:
-data:                             198c4803-1236-4c3f-ad90-46e5f3b4cd2a
-data:                             http://myhomepage
-info:    ad sp create command OK
-```
-Save the Object Id and the GUID in the Service Principal Names section.  This GUID is the Application ID / Client ID (aadClientId parameter).  The the password you entered as part of the CLI command is the input the aadClientSecret paramter.
-
-2. **Assign permissions to Service Principal for specific Resource Group**<br/>
-  a.  Sign into the Azure Portal<br/>
-  b.  Select the Resource Group you want to assign permissions to<br/>
-  c.  Select Access control (IAM) from middle pane<br/>
-  d.  Click Add on right pane<br/>
-  e.  For Role, Select Contributor<br/>
-  f.  In Select field, type the name of your Service Principal to find it<br/>
-  g.  Click the Service Principal from the list and hit Save<br/>
-
+Assigning permissions to the entire Subscription is the easiest method but does give the Service Principal permissions to all resources in the Subscription.  Assigning permissions to only the Resource Group is the most secure as the Service Principal is restricted to only that one Resource Group. 
+   
 **Azure CLI 2.0**
 
-1. **Create Service Principal and assign permissions to Resource Group**<br/>
-  a.  az ad sp create-for-rbac -n \<friendly name\> --password \<password\> --role contributor --scopes /subscriptions/\<subscription_id\>/resourceGroups/\<Resource Group Name\><br/>
+1. **Create Service Principal and assign permissions to Subscription**<br/>
+  a.  az ad sp create-for-rbac -n \<friendly name\> --password \<password\> --role contributor --scopes /subscriptions/\<subscription_id\><br/>
+      Ex: `az ad sp create-for-rbac -n openshiftcloudprovider --password Pass@word1 --role contributor --scopes /subscriptions/555a123b-1234-5ccc-defgh-6789abcdef01`<br/>
+
+2. **Create Service Principal and assign permissions to Resource Group**<br/>
+  a.  If you use this option, you must have created the Resource Group first.  Be sure you don't create any resources in this Resource Group before deploying the cluster.<br/>
+  b.  az ad sp create-for-rbac -n \<friendly name\> --password \<password\> --role contributor --scopes /subscriptions/\<subscription_id\>/resourceGroups/\<Resource Group Name\><br/>
       Ex: `az ad sp create-for-rbac -n openshiftcloudprovider --password Pass@word1 --role contributor --scopes /subscriptions/555a123b-1234-5ccc-defgh-6789abcdef01/resourceGroups/00000test`<br/>
 
-2. **Create Service Principal without assigning permissions to Resource Group**<br/>
-  a.  az ad sp create-for-rbac -n \<friendly name\> --password \<password\> --role contributor --skip-assignment<br/>
+3. **Create Service Principal without assigning permissions to Resource Group**<br/>
+  a.  If you use this option, you will need to assign permissions to either the Subscription or the newly created Resource Group shortly after you initiate the deployment of the cluster or the post installation scripts will fail when configuring Azure as the Cloud Provider.<br/>
+  b.  az ad sp create-for-rbac -n \<friendly name\> --password \<password\> --role contributor --skip-assignment<br/>
       Ex: `az ad sp create-for-rbac -n openshiftcloudprovider --password Pass@word1 --role contributor --skip-assignment`<br/>
 
 You will get an output similar to:
@@ -134,14 +109,13 @@ You will get an output similar to:
 
 The appId is used for the aadClientId parameter.
 
-To assign permissions, please follow the instructions from Azure CLI 1.0 Step 2 above.
-
 ### azuredeploy.Parameters.json File Explained
 
 1.  _artifactsLocation: The base URL where artifacts required by this template are located. If you are using your own fork of the repo and want the deployment to pick up artifacts from your fork, update this value appropriately (user and branch), for example, change from `https://raw.githubusercontent.com/Microsoft/openshift-origin/master/` to `https://raw.githubusercontent.com/YourUser/openshift-origin/YourBranch/`
 2.  masterVmSize: Size of the Master VM. Select from one of the allowed VM sizes listed in the azuredeploy.json file
 3.  infraVmSize: Size of the Infra VM. Select from one of the allowed VM sizes listed in the azuredeploy.json file
 3.  nodeVmSize: Size of the Node VM. Select from one of the allowed VM sizes listed in the azuredeploy.json file
+4.  storageKind: The type of storage to be used. Value is either "managed" or "unmanaged"
 5.  openshiftClusterPrefix: Cluster Prefix used to configure hostnames for all nodes - master, infra and nodes. Between 1 and 20 characters
 8.  masterInstanceCount: Number of Masters nodes to deploy
 8.  infraInstanceCount: Number of infra nodes to deploy
@@ -149,16 +123,22 @@ To assign permissions, please follow the instructions from Azure CLI 1.0 Step 2 
 9.  dataDiskSize: Size of data disk to attach to nodes for Docker volume - valid sizes are 128 GB, 512 GB and 1023 GB
 10. adminUsername: Admin username for both OS login and OpenShift login
 11. openshiftPassword: Password for OpenShift login
+11. enableMetrics: Enable Metrics - value is either "true" or "false"
+11. enableLogging: Enable Logging - value is either "true" or "false"
+11. enableCockpit: Enable Cockpit - value is either "true" or "false"
 12. sshPublicKey: Copy your SSH Public Key here
 14. keyVaultResourceGroup: The name of the Resource Group that contains the Key Vault
 15. keyVaultName: The name of the Key Vault you created
 16. keyVaultSecret: The Secret Name you used when creating the Secret (that contains the Private Key)
+18. enableAzure: Enable Azure Cloud Provider - value is either "true" or "false"
 18. aadClientId: Azure Active Directory Client ID also known as Application ID for Service Principal
 18. aadClientSecret: Azure Active Directory Client Secret for Service Principal
 17. defaultSubDomainType: This will either be nipio (if you don't have your own domain) or custom if you have your own domain that you would like to use for routing
 18. defaultSubDomain: The wildcard DNS name you would like to use for routing if you selected custom above.  If you selected nipio above, then this field will be ignored
 
 ## Deploy Template
+
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FMicrosoft%2Fopenshift-origin%2Fmaster%2Fazuredeploy.json" target="_blank"><img src="http://azuredeploy.net/deploybutton.png"/></a>
 
 Once you have collected all of the prerequisites for the template, you can deploy the template by populating the *azuredeploy.parameters.local.json* file and executing Resource Manager deployment commands with PowerShell or the CLI.
 
