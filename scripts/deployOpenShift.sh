@@ -106,6 +106,21 @@ cat > /home/${SUDOUSER}/assignclusteradminrights.yml <<EOF
     shell: "oadm policy add-cluster-role-to-user cluster-admin {{ lookup('env','SUDOUSER') }} --config=/etc/origin/master/admin.kubeconfig"
 EOF
 
+# Run on all nodes - Set Root password on all nodes
+
+cat > /home/${SUDOUSER}/assignrootpassword.yml <<EOF
+---
+- hosts: nodes
+  gather_facts: no
+  become: yes
+  become_method: sudo
+  vars:
+    description: "Set password for Cockpit"
+  tasks:
+  - name: configure Cockpit password
+    shell: echo \"{{ lookup('env','PASSWORD') }}\"|passwd root --stdin
+EOF
+
 # Run on MASTER-0 node - configure registry to use Azure Storage
 # Create docker registry config based on Commercial Azure or Azure Government
 
