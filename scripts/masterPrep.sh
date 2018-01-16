@@ -1,7 +1,7 @@
 #!/bin/bash
 echo $(date) " - Starting Script"
 
-STORAGEACCOUNT1=$1
+STORAGEACCOUNT=$1
 SUDOUSER=$2
 LOCATION=$3
 
