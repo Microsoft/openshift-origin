@@ -6,7 +6,8 @@ This CHANGELOG.md file will contain the update log for the latest set of updates
 2.  Update Azure Cloud Provider setup playbooks and configuration.
 3.  Provide option to enable metrics, logging, Cockpit and Azure Cloud Provider.
 4.  Include additional data disk sizes.
-5.  General cleanup.
+5.  Implement diagnostics logs for VMs.
+6.  General cleanup.
 
 
 # UPDATE - December 21, 2017
