@@ -20,12 +20,18 @@ yum -y install cloud-utils-growpart.noarch
 yum -y update --exclude=WALinuxAgent
 
 # Only install Ansible and pyOpenSSL on Master-0 Node
+# python-passlib needed for metrics
 
 if hostname -f|grep -- "-0" >/dev/null
 then
-   echo $(date) " - Installing Ansible and pyOpenSSL"
-   yum -y --enablerepo=epel install ansible pyOpenSSL
+   echo $(date) " - Installing Ansible, pyOpenSSL and python-passlib"
+   yum -y --enablerepo=epel install ansible pyOpenSSL python-passlib
 fi
+
+# Install java to support metrics
+echo $(date) " - Installing Java"
+
+yum -y install java-1.8.0-openjdk-headless
 
 # Grow Root File System
 echo $(date) " - Grow Root FS"
