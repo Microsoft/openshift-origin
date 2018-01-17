@@ -158,11 +158,13 @@ Monitor deployment via CLI or Portal and get the console URL from outputs of suc
 
 The cluster will use self-signed certificates. Accept the warning and proceed to the login page.
 
+If you chose to deploy metrics and / or logging, make sure you select an appropriate VM size (i.e. the Standard_DS2_v2 is too small).  Also, the deployment will take longer as extra time is needed for the additional playbooks to run.
+
 ### NOTE
 
 The OpenShift Ansible playbook does take a while to run when using VMs backed by Standard Storage. VMs backed by Premium Storage are faster. If you want Premimum Storage, select a DS or GS series VM.
 <hr />
-Be sure to follow the OpenShift instructions to create the ncessary DNS entry for the OpenShift Router for access to applications.
+Be sure to follow the OpenShift instructions to create the necessary DNS entry for the OpenShift Router for access to applications.
 
 ### TROUBLESHOOTING
 
