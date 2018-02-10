@@ -157,7 +157,7 @@ cat > /home/${SUDOUSER}/dockerregistry.yml <<EOF
     shell: oc env dc docker-registry -e REGISTRY_STORAGE=azure -e REGISTRY_STORAGE_AZURE_ACCOUNTNAME=$REGISTRYSA -e REGISTRY_STORAGE_AZURE_ACCOUNTKEY=$ACCOUNTKEY -e REGISTRY_STORAGE_AZURE_CONTAINER=registry
 EOF
 
-export CLOUDNAME="AzureCloud"
+export CLOUDNAME="AzurePublicCloud"
 
 fi
 
