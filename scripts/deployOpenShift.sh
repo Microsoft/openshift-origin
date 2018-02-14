@@ -140,6 +140,8 @@ cat > /home/${SUDOUSER}/dockerregistry.yml <<EOF
     shell: oc env dc docker-registry -e REGISTRY_STORAGE=azure -e REGISTRY_STORAGE_AZURE_ACCOUNTNAME=$REGISTRYSA -e REGISTRY_STORAGE_AZURE_ACCOUNTKEY=$ACCOUNTKEY -e REGISTRY_STORAGE_AZURE_CONTAINER=registry -e REGISTRY_STORAGE_AZURE_REALM=core.usgovcloudapi.net
 EOF
 
+export CLOUDNAME="AzureUSGovernmentCloud"
+
 else
 
 cat > /home/${SUDOUSER}/dockerregistry.yml <<EOF
@@ -154,6 +156,8 @@ cat > /home/${SUDOUSER}/dockerregistry.yml <<EOF
   - name: Configure docker-registry to use Azure Storage
     shell: oc env dc docker-registry -e REGISTRY_STORAGE=azure -e REGISTRY_STORAGE_AZURE_ACCOUNTNAME=$REGISTRYSA -e REGISTRY_STORAGE_AZURE_ACCOUNTKEY=$ACCOUNTKEY -e REGISTRY_STORAGE_AZURE_CONTAINER=registry
 EOF
+
+export CLOUDNAME="AzurePublicCloud"
 
 fi
 
@@ -243,7 +247,8 @@ cat > /home/${SUDOUSER}/setup-azure-master.yml <<EOF
           "subscriptionId": "{{ lookup('env','SUBSCRIPTIONID') }}",
           "tenantId": "{{ lookup('env','TENANTID') }}",
           "resourceGroup": "{{ lookup('env','RESOURCEGROUP') }}",
-          "location": "{{ lookup('env','LOCATION') }}"
+          "location": "{{ lookup('env','LOCATION') }}",
+          "cloud": "{{ lookup('env','CLOUDNAME') }}"
         } 
     notify:
     - restart origin-master-api
@@ -309,7 +314,8 @@ cat > /home/${SUDOUSER}/setup-azure-node-master.yml <<EOF
           "subscriptionId": "{{ lookup('env','SUBSCRIPTIONID') }}",
           "tenantId": "{{ lookup('env','TENANTID') }}",
           "resourceGroup": "{{ lookup('env','RESOURCEGROUP') }}",
-          "location": "{{ lookup('env','LOCATION') }}"
+          "location": "{{ lookup('env','LOCATION') }}",
+          "cloud": "{{ lookup('env','CLOUDNAME') }}"
         } 
     notify:
     - restart origin-node
@@ -364,7 +370,8 @@ cat > /home/${SUDOUSER}/setup-azure-node.yml <<EOF
           "subscriptionId": "{{ lookup('env','SUBSCRIPTIONID') }}",
           "tenantId": "{{ lookup('env','TENANTID') }}",
           "resourceGroup": "{{ lookup('env','RESOURCEGROUP') }}",
-          "location": "{{ lookup('env','LOCATION') }}"
+          "location": "{{ lookup('env','LOCATION') }}",
+          "cloud": "{{ lookup('env','CLOUDNAME') }}"
         } 
     notify:
     - restart origin-node
