@@ -13,6 +13,8 @@ Bookmark [aka.ms/OpenShift](http://aka.ms/OpenShift) for future reference.
 
 For the **OpenShift Container Platform** refer to https://github.com/Microsoft/openshift-container-platform
 
+Additional documentation for deploying OpenShift in Azure can be found here: https://docs.microsoft.com/en-us/azure/virtual-machines/linux/openshift-get-started
+
 Change log located in CHANGELOG.md
 
 ## OpenShift Origin 3.7 with Username / Password
@@ -124,7 +126,6 @@ The appId is used for the aadClientId parameter.
 11. openshiftPassword: Password for OpenShift login
 11. enableMetrics: Enable Metrics - value is either "true" or "false"
 11. enableLogging: Enable Logging - value is either "true" or "false"
-11. enableCockpit: Enable Cockpit - value is either "true" or "false"
 12. sshPublicKey: Copy your SSH Public Key here
 14. keyVaultResourceGroup: The name of the Resource Group that contains the Key Vault
 15. keyVaultName: The name of the Key Vault you created
