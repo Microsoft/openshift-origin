@@ -622,7 +622,7 @@ then
 	echo $(date) "- Sleep for 20"
 	
 	sleep 20
-	runuser -l $SUDOUSER -c  "oc label nodes $MASTER-0 openshift-infra=apiserver"	
+	runuser -l $SUDOUSER -c  "oc label nodes $MASTER-0 openshift-infra=apiserver --overwrite=true"	
 	runuser -l $SUDOUSER -c  "oc label nodes --all logging-infra-fluentd=true logging=true"
 
 	runuser -l $SUDOUSER -c  "ansible all -b  -m service -a 'name=openvswitch state=restarted' "
@@ -641,13 +641,15 @@ fi
 
 if [ $METRICS == "true" ]
 then
-	sleep 30
+	sleep 30	
+	echo $(date) "- Determining Origin version from rpm"
+	OO_VERSION=$(rpm -q origin | cut -d'-' -f 2)	
 	echo $(date) "- Deploying Metrics"
 	if [ $AZURE == "true" ]
 	then
-		runuser -l $SUDOUSER -c "ansible-playbook /home/$SUDOUSER/openshift-ansible/playbooks/byo/openshift-cluster/openshift-metrics.yml -e openshift_metrics_install_metrics=True -e openshift_metrics_cassandra_storage_type=dynamic"
+		runuser -l $SUDOUSER -c "ansible-playbook /home/$SUDOUSER/openshift-ansible/playbooks/byo/openshift-cluster/openshift-metrics.yml -e openshift_metrics_install_metrics=True -e openshift_metrics_cassandra_storage_type=dynamic -e openshift_hosted_metrics_deployer_version=$OO_VERSION"
 	else
-		runuser -l $SUDOUSER -c "ansible-playbook /home/$SUDOUSER/openshift-ansible/playbooks/byo/openshift-cluster/openshift-metrics.yml -e openshift_metrics_install_metrics=True"
+		runuser -l $SUDOUSER -c "ansible-playbook /home/$SUDOUSER/openshift-ansible/playbooks/byo/openshift-cluster/openshift-metrics.yml -e openshift_metrics_install_metrics=True -e openshift_hosted_metrics_deployer_version=$OO_VERSION"
 	fi
 	if [ $? -eq 0 ]
 	then
