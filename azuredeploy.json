@@ -344,7 +344,7 @@
 		"imageReference": {
 			"publisher": "Openlogic",
 			"offer": "CentOS",
-			"sku": "7.5",
+			"sku": "7.4",
 			"version": "latest"
 		},
 		"redHatTags": {
