@@ -238,7 +238,7 @@ echo $(date) " - Running network_manager.yml playbook"
 
 # Setup NetworkManager to manage eth0
 echo $(date) " - Setting up NetworkManager on eth0"
-runuser -l $SUDOUSER -c "ansible-playbook openshift-ansible/playbooks/byo/openshift-node/network_manager.yml"
+runuser -l $SUDOUSER -c "ansible-playbook /home/$SUDOUSER/openshift-ansible/playbooks/openshift-node/network_manager.yml"
 
 sleep 20
 runuser -l $SUDOUSER -c "ansible all -b -m service -a \"name=NetworkManager state=restarted\""
