@@ -282,16 +282,6 @@ runuser $SUDOUSER -c "ansible-playbook -f 10 ~/openshift-container-platform-play
 
 if [[ $AZURE == "true" ]]
 then
-
-	# Create Storage Classes
-	echo $(date) "- Creating Storage Classes"
-
-	runuser $SUDOUSER -c "ansible-playbook -f 10 ~/openshift-container-platform-playbooks/configurestorageclass.yaml"
-
-	echo $(date) "- Sleep for 120"
-
-	sleep 120
-
 	# Execute setup-azure-master and setup-azure-node playbooks to configure Azure Cloud Provider
 	echo $(date) "- Configuring OpenShift Cloud Provider to be Azure"
 
@@ -348,6 +338,13 @@ then
 	   echo $(date) "- Cloud Provider setup did not complete"
 	   exit 10
 	fi
+	
+	# Create Storage Class
+	echo $(date) "- Creating Storage Class"
+
+	runuser $SUDOUSER -c "ansible-playbook -f 10 ~/openshift-container-platform-playbooks/configurestorageclass.yaml"
+	echo $(date) "- Sleep for 15"
+	sleep 15
 	
 	# Installing Service Catalog, Ansible Service Broker and Template Service Broker
 	
