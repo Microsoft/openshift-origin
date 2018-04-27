@@ -49,37 +49,6 @@ sed -i -e "s/^# control_path = %(directory)s\/%%h-%%r/control_path = %(directory
 sed -i -e "s/^#host_key_checking = False/host_key_checking = False/" /etc/ansible/ansible.cfg
 sed -i -e "s/^#pty=False/pty=False/" /etc/ansible/ansible.cfg
 
-# Create playbook to update ansible.cfg file
-
-cat > updateansiblecfg.yaml <<EOF
-#!/usr/bin/ansible-playbook
-
-- hosts: localhost
-  gather_facts: no
-  tasks:
-  - lineinfile:
-      dest: /etc/ansible/ansible.cfg
-      regexp: '^library '
-      insertafter: '#library        = /usr/share/my_modules/'
-      line: 'library = /home/${SUDOUSER}/openshift-ansible/library/'
-EOF
-
-# Run Ansible Playbook to update ansible.cfg file
-
-echo $(date) " - Updating ansible.cfg file"
-
-ansible-playbook ./updateansiblecfg.yaml
-
-# Create docker registry config based on Commercial Azure or Azure Government
-if [[ $CLOUD == "US" ]]
-then
-  DOCKERREGISTRYYAML=dockerregistrygov.yaml
-  export CLOUDNAME="AzureUSGovernmentCloud"
-else
-  DOCKERREGISTRYYAML=dockerregistrypublic.yaml
-  export CLOUDNAME="AzurePublicCloud"
-fi
-
 # Cloning Ansible playbook repository
 (cd /home/$SUDOUSER && git clone https://github.com/Microsoft/openshift-container-platform-playbooks.git)
 if [ -d /home/${SUDOUSER}/openshift-container-platform-playbooks ]
@@ -89,6 +58,22 @@ then
 else
   echo " - Retrieval of playbooks failed"
   exit 99
+fi
+
+# Run Ansible Playbook to update ansible.cfg file
+
+echo $(date) " - Updating ansible.cfg file"
+
+ansible-playbook /home/$SUDOUSER/openshift-container-platform-playbooks/updateansiblecfg-origin.yaml
+
+# Create docker registry config based on Commercial Azure or Azure Government
+if [[ $CLOUD == "US" ]]
+then
+  DOCKERREGISTRYYAML=dockerregistrygov.yaml
+  export CLOUDNAME="AzureUSGovernmentCloud"
+else
+  DOCKERREGISTRYYAML=dockerregistrypublic.yaml
+  export CLOUDNAME="AzurePublicCloud"
 fi
 
 # Create Master nodes grouping
