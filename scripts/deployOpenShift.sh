@@ -181,7 +181,7 @@ openshift_metrics_startup_timeout=120
 openshift_metrics_hawkular_nodeselector={"region":"infra"}
 openshift_metrics_cassandra_nodeselector={"region":"infra"}
 openshift_metrics_heapster_nodeselector={"region":"infra"}
-openshift_hosted_metrics_public_url=https://metrics.$ROUTING/hawkular/metrics
+#openshift_metrics_hawkular_hostname=https://hawkular-metrics.$ROUTING/hawkular/metrics
 
 # Setup logging
 openshift_logging_install_logging=false
@@ -364,13 +364,13 @@ if [ $METRICS == "true" ]
 then
 	sleep 30	
 	echo $(date) "- Determining Origin version from rpm"
-	OO_VERSION="v"$(rpm -q origin | cut -d'-' -f 2 | head -c 3)	
+	OO_VERSION="v"$(rpm -q origin | cut -d'-' -f 2 | head -c 3)
 	echo $(date) "- Deploying Metrics"
 	if [ $AZURE == "true" ]
 	then
-		runuser -l $SUDOUSER -c "ansible-playbook -f 10 /home/$SUDOUSER/openshift-ansible/playbooks/openshift-metrics/config.yml -e openshift_metrics_install_metrics=True -e openshift_metrics_cassandra_storage_type=dynamic -e openshift_hosted_metrics_deployer_version=$OO_VERSION"
+		runuser -l $SUDOUSER -c "ansible-playbook -f 10 /home/$SUDOUSER/openshift-ansible/playbooks/openshift-metrics/config.yml -e openshift_metrics_install_metrics=True -e openshift_metrics_cassandra_storage_type=dynamic -e openshift_metrics_image_version=$OO_VERSION"
 	else
-		runuser -l $SUDOUSER -c "ansible-playbook -f 10 /home/$SUDOUSER/openshift-ansible/playbooks/openshift-metrics/config.yml -e openshift_metrics_install_metrics=True -e openshift_hosted_metrics_deployer_version=$OO_VERSION"
+		runuser -l $SUDOUSER -c "ansible-playbook -f 10 /home/$SUDOUSER/openshift-ansible/playbooks/openshift-metrics/config.yml -e openshift_metrics_install_metrics=True -e openshift_metrics_image_version=$OO_VERSION"
 	fi
 	if [ $? -eq 0 ]
 	then
