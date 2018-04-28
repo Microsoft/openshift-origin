@@ -72,7 +72,7 @@ cat > updateansiblecfg.yaml <<EOF
       dest: /etc/ansible/ansible.cfg
       regexp: '^library '
       insertafter: '#library        = /usr/share/my_modules/'
-      line: 'library = /home/${SUDOUSER}/openshift-ansible/library/'
+      line: 'library = /home/${SUDOUSER}/openshift-ansible/roles/lib_utils/library/'
 EOF
 
 # Run Ansible Playbook to update ansible.cfg file
