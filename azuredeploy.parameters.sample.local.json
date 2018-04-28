@@ -24,10 +24,10 @@
 			"value": 3
 		},
 		"infraInstanceCount": {
-			"value": 2
+			"value": 3
 		},
 		"nodeInstanceCount": {
-			"value": 1
+			"value": 2
 		},
 		"dataDiskSize": {
 			"value": 128
@@ -39,12 +39,9 @@
 			"value": "ThisIsYourSampleSecret!ShouldStayLocal!"
 		},
 		"enableMetrics": {
-			"value": "false"
+			"value": "true"
 		},
 		"enableLogging": {
-			"value": "false"
-		},
-		"enableCockpit": {
 			"value": "false"
 		},
 		"sshPublicKey": {

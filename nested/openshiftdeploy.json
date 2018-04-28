@@ -28,70 +28,60 @@
 		},
 		"newStorageAccountRegistry": {
 			"type": "string",
-			"minLength": 1,
 			"metadata": {
 				"description": "Storage Account for Docker Registry"
 			}
 		},
 		"newStorageAccountKey": {
 			"type": "string",
-			"minLength": 1,
 			"metadata": {
 				"description": "Storage Account Key for Docker Registry"
 			}
 		},
 		"openshiftMasterHostname": {
 			"type": "string",
-			"minLength": 1,
 			"metadata": {
 				"description": "OpenShift Master hostname"
 			}
 		},
 		"openshiftMasterPublicIpFqdn": {
 			"type": "string",
-			"minLength": 1,
 			"metadata": {
 				"description": "OpenShift Master VM public IP fully qualified domain name"
 			}
 		},
 		"openshiftMasterPublicIpAddress": {
 			"type": "string",
-			"minLength": 1,
 			"metadata": {
 				"description": "OpenShift Master VM public IP address"
 			}
 		},
 		"openshiftInfraHostname": {
 			"type": "string",
-			"minLength": 1,
 			"metadata": {
 				"description": "OpenShift Infra Node hostname"
 			}
 		},
 		"openshiftNodeHostname": {
 			"type": "string",
-			"minLength": 1,
 			"metadata": {
 				"description": "OpenShift Node hostname"
 			}
 		},
 		"masterInstanceCount": {
 			"type": "int",
-			"minValue": 1,
 			"metadata": {
 				"description": "Number of OpenShift Master nodes"
 			}
 		},
 		"infraInstanceCount": {
 			"type": "int",
-			"minValue": 1,
 			"metadata": {
 				"description": "Number of OpenShift Infra nodes"
 			}
 		},
 		"nodeInstanceCount": {
 			"type": "int",
-			"minValue": 1,
 			"metadata": {
 				"description": "Number of OpenShift nodes"
 			}
@@ -128,12 +118,6 @@
 				"description": "Enable OpenShift Logging: true or false"
 			}
 		},
-		"enableCockpit": {
-			"type": "string",
-			"metadata": {
-				"description": "Enable Cockpit: true or false"
-			}
-		},
 		"enableAzure": {
 			"type": "string",
 			"metadata": {
@@ -142,14 +126,12 @@
 		},
 		"aadClientId": {
 			"type": "string",
-			"minLength": 1,
 			"metadata": {
 				"description": "Azure AD Client ID"
 			}
 		},
 		"aadClientSecret": {
 			"type": "securestring",
-			"minLength": 1,
 			"metadata": {
 				"description": "Azure AD Client Secret"
 			}
@@ -201,7 +183,9 @@
 		"tags": {
 			"displayName": "DeployOpenShift",
 			"provider": "[parameters('redHatTags').provider]",
-			"app": "[parameters('redHatTags').app]"
+			"app": "[parameters('redHatTags').app]",
+			"version": "[parameters('redHatTags').version]",
+			"platform": "[parameters('redHatTags').platform]"
 		},
 		"properties": {
 			"publisher": "Microsoft.Azure.Extensions",
@@ -214,7 +198,7 @@
 				]
 			},
 			"protectedSettings": {
-				"commandToExecute": "[concat('bash ', parameters('openshiftDeploymentScriptFileName'), ' \"', parameters('adminUsername'), '\" ', variables('singlequote'), parameters('openshiftPassword'), variables('singlequote'), ' \"', parameters('sshPrivateKey'), '\" \"', parameters('openshiftMasterHostname'), '\" \"', parameters('openshiftMasterPublicIpFqdn'), '\" \"', parameters('openshiftMasterPublicIpAddress'), '\" \"', parameters('openshiftInfraHostname'), '\" \"', parameters('openshiftNodeHostname'), '\" \"', parameters('nodeInstanceCount'), '\" \"', parameters('infraInstanceCount'), '\" \"', parameters('MasterInstanceCount'), '\" \"', parameters(parameters('subDomainChosen')), '\" \"', parameters('newStorageAccountRegistry'), '\" ', variables('singlequote'), parameters('newStorageAccountKey'), variables('singlequote'), ' ', variables('singlequote'), variables('tenantId'), variables('singlequote'), ' ', variables('singlequote'), variables('subscriptionId'), variables('singlequote'), ' ', variables('singlequote'), parameters('aadClientId'), variables('singlequote'), ' ', variables('singlequote'), parameters('aadClientSecret'), variables('singlequote'), ' ', variables('singlequote'), variables('resourceGroupName'), variables('singlequote'), ' ', variables('singlequote'), variables('location'), variables('singlequote'), ' ', variables('singlequote'), parameters('enableMetrics'), variables('singlequote'), ' ', variables('singlequote'), parameters('enableLogging'), variables('singlequote'), ' ', variables('singlequote'), parameters('enableCockpit'), variables('singlequote'), ' ', variables('singlequote'), parameters('enableAzure'), variables('singlequote'), ' ', variables('singlequote'), parameters('storageKind'), variables('singlequote'))]"
+				"commandToExecute": "[concat('bash ', parameters('openshiftDeploymentScriptFileName'), ' \"', parameters('adminUsername'), '\" ', variables('singlequote'), parameters('openshiftPassword'), variables('singlequote'), ' \"', parameters('sshPrivateKey'), '\" \"', parameters('openshiftMasterHostname'), '\" \"', parameters('openshiftMasterPublicIpFqdn'), '\" \"', parameters('openshiftMasterPublicIpAddress'), '\" \"', parameters('openshiftInfraHostname'), '\" \"', parameters('openshiftNodeHostname'), '\" \"', parameters('nodeInstanceCount'), '\" \"', parameters('infraInstanceCount'), '\" \"', parameters('MasterInstanceCount'), '\" \"', parameters(parameters('subDomainChosen')), '\" \"', parameters('newStorageAccountRegistry'), '\" ', variables('singlequote'), parameters('newStorageAccountKey'), variables('singlequote'), ' ', variables('singlequote'), variables('tenantId'), variables('singlequote'), ' ', variables('singlequote'), variables('subscriptionId'), variables('singlequote'), ' ', variables('singlequote'), parameters('aadClientId'), variables('singlequote'), ' ', variables('singlequote'), parameters('aadClientSecret'), variables('singlequote'), ' ', variables('singlequote'), variables('resourceGroupName'), variables('singlequote'), ' ', variables('singlequote'), variables('location'), variables('singlequote'), ' ', variables('singlequote'), parameters('enableMetrics'), variables('singlequote'), ' ', variables('singlequote'), parameters('enableLogging'), variables('singlequote'), ' ', variables('singlequote'), parameters('enableAzure'), variables('singlequote'), ' ', variables('singlequote'), parameters('storageKind'), variables('singlequote'))]"
 			}
 		}
 	}],

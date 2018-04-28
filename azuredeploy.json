@@ -109,7 +109,7 @@
 		},
 		"infraInstanceCount": {
 			"type": "int",
-			"defaultValue": 2,
+			"defaultValue": 3,
 			"allowedValues": [2, 3],
 			"metadata": {
 				"description": "Number of OpenShift infra nodes."
@@ -118,7 +118,6 @@
 		"nodeInstanceCount": {
 			"type": "int",
 			"defaultValue": 2,
-			"minValue": 1,
 			"allowedValues": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30],
 			"metadata": {
 				"description": "Number of OpenShift nodes"
@@ -127,7 +126,6 @@
 		"dataDiskSize": {
 			"type": "int",
 			"defaultValue": 64,
-			"minValue": 1,
 			"allowedValues": [32, 64, 128, 256, 512, 1024, 2048],
 			"metadata": {
 				"description": "Size of Datadisk in GB for Docker volume"
@@ -174,16 +172,6 @@
 				"description": "Enable OpenShift Logging: true or false"
 			}
 		},
-		"enableCockpit": {
-			"type": "string",
-			"defaultValue": "false",
-			"allowedValues": [
-				"true", "false"
-			],
-			"metadata": {
-				"description": "Enable Cockpit: true or false"
-			}
-		},
 		"keyVaultResourceGroup": {
 			"type": "string",
 			"minLength": 1,
@@ -207,7 +195,7 @@
 		},
 		"enableAzure": {
 			"type": "string",
-			"defaultValue": "false",
+			"defaultValue": "true",
 			"allowedValues": [
 				"true", "false"
 			],
@@ -217,14 +205,14 @@
 		},
 		"aadClientId": {
 			"type": "string",
-			"minLength": 1,
+			"defaultValue": "",
 			"metadata": {
 				"description": "Azure AD Client ID"
 			}
 		},
 		"aadClientSecret": {
 			"type": "securestring",
-			"minLength": 1,
+			"defaultValue": "",
 			"metadata": {
 				"description": "Azure AD Client Secret"
 			}
@@ -344,8 +332,7 @@
 		"masterLbFrontEndConfigId": "[concat(variables('masterLbId'), '/frontendIPConfigurations/loadBalancerFrontEnd')]",
 		"masterLbBackendPoolId": "[concat(variables('masterLbId'),'/backendAddressPools/loadBalancerBackend')]",
 		"masterLbHttpProbeId": "[concat(variables('masterLbId'),'/probes/httpProbe')]",
-		"masterLb8443ProbeId": "[concat(variables('masterLbId'),'/probes/8443Probe')]",
-		"masterLbCockpitProbeId": "[concat(variables('masterLbId'),'/probes/cockpitProbe')]",
+		"masterLbHttpsProbeId": "[concat(variables('masterLbId'),'/probes/httpsProbe')]",
 
 		"infraLoadBalancerName": "[concat(variables('openshiftInfraHostname'), 'lb')]",
 		"infraPublicIpAddressId": "[resourceId('Microsoft.Network/publicIPAddresses', variables('infraLbPublicIpDnsLabel'))]",
@@ -354,7 +341,6 @@
 		"infraLbBackendPoolId": "[concat(variables('infraLbId'),'/backendAddressPools/loadBalancerBackend')]",
 		"infraLbHttpProbeId": "[concat(variables('infraLbId'),'/probes/httpProbe')]",
 		"infraLbHttpsProbeId": "[concat(variables('infraLbId'),'/probes/httpsProbe')]",
-		"infraLbCockpitProbeId": "[concat(variables('infraLbId'),'/probes/cockpitProbe')]",
 		"imageReference": {
 			"publisher": "Openlogic",
 			"offer": "CentOS",
@@ -363,6 +349,8 @@
 		},
 		"redHatTags": {
 			"app": "OpenShiftOrigin",
+			"version": "3.9",
+			"platform": "AzureStack",
 			"provider": "9d2c71fc-96ba-4b4a-93b3-14def5bc96fc"
 		},
 		"singlequote": "'",
@@ -695,7 +683,10 @@
 			"tags": {
 				"displayName": "MasterNSG",
 				"provider": "[variables('redHatTags').provider]",
-				"app": "[variables('redHatTags').app]"
+				"app": "[variables('redHatTags').app]",
+				"version": "[variables('redHatTags').version]",
+				"platform": "[variables('redHatTags').platform]"
+
 			},
 			"properties": {
 				"securityRules": [{
@@ -724,19 +715,6 @@
 						"priority": 200,
 						"direction": "Inbound"
 					}
-				}, {
-					"name": "allowOpenShiftConsoleIn_all",
-					"properties": {
-						"description": "Allow OpenShift Console connections from all locations",
-						"protocol": "Tcp",
-						"sourcePortRange": "*",
-						"destinationPortRange": "8443",
-						"sourceAddressPrefix": "*",
-						"destinationAddressPrefix": "*",
-						"access": "Allow",
-						"priority": 300,
-						"direction": "Inbound"
-					}
 				}]
 			}
 		}, {
@@ -747,7 +725,9 @@
 			"tags": {
 				"displayName": "InfraNSG",
 				"provider": "[variables('redHatTags').provider]",
-				"app": "[variables('redHatTags').app]"
+				"app": "[variables('redHatTags').app]",
+				"version": "[variables('redHatTags').version]",
+				"platform": "[variables('redHatTags').platform]"
 			},
 			"properties": {
 				"securityRules": [{
@@ -799,7 +779,9 @@
 			"tags": {
 				"displayName": "NodeNSG",
 				"provider": "[variables('redHatTags').provider]",
-				"app": "[variables('redHatTags').app]"
+				"app": "[variables('redHatTags').app]",
+				"version": "[variables('redHatTags').version]",
+				"platform": "[variables('redHatTags').platform]"
 			},
 			"properties": {
 				"securityRules": [{
@@ -850,7 +832,9 @@
 			"tags": {
 				"displayName": "VirtualNetwork",
 				"provider": "[variables('redHatTags').provider]",
-				"app": "[variables('redHatTags').app]"
+				"app": "[variables('redHatTags').app]",
+				"version": "[variables('redHatTags').version]",
+				"platform": "[variables('redHatTags').platform]"
 			},
 			"apiVersion": "[variables('apiVersionNetwork')]",
 			"properties": {
@@ -880,7 +864,9 @@
 			"tags": {
 				"displayName": "[variables('newStorageAccountArray')[copyIndex()].tagName]",
 				"provider": "[variables('redHatTags').provider]",
-				"app": "[variables('redHatTags').app]"
+				"app": "[variables('redHatTags').app]",
+				"version": "[variables('redHatTags').version]",
+				"platform": "[variables('redHatTags').platform]"
 			},
 			"copy": {
 				"name": "storageLoop",
@@ -898,7 +884,9 @@
 			"tags": {
 				"displayName": "OpenShiftInfraLBPublicIP",
 				"provider": "[variables('redHatTags').provider]",
-				"app": "[variables('redHatTags').app]"
+				"app": "[variables('redHatTags').app]",
+				"version": "[variables('redHatTags').version]",
+				"platform": "[variables('redHatTags').platform]"
 			},
 			"properties": {
 				"publicIPAllocationMethod": "Static",
@@ -914,7 +902,9 @@
 			"tags": {
 				"displayName": "OpenShiftMasterPublicIP",
 				"provider": "[variables('redHatTags').provider]",
-				"app": "[variables('redHatTags').app]"
+				"app": "[variables('redHatTags').app]",
+				"version": "[variables('redHatTags').version]",
+				"platform": "[variables('redHatTags').platform]"
 			},
 			"properties": {
 				"publicIPAllocationMethod": "Static",
@@ -937,7 +927,9 @@
 			"tags": {
 				"displayName": "[variables('availabilitySetArray')[copyIndex()].tagName]",
 				"provider": "[variables('redHatTags').provider]",
-				"app": "[variables('redHatTags').app]"
+				"app": "[variables('redHatTags').app]",
+				"version": "[variables('redHatTags').version]",
+				"platform": "[variables('redHatTags').platform]"
 			},
 			"copy": {
 				"name": "availabiltySetLoop",
@@ -951,7 +943,9 @@
 			"tags": {
 				"displayName": "OpenShiftMasterLB",
 				"provider": "[variables('redHatTags').provider]",
-				"app": "[variables('redHatTags').app]"
+				"app": "[variables('redHatTags').app]",
+				"version": "[variables('redHatTags').version]",
+				"platform": "[variables('redHatTags').platform]"
 			},
 			"dependsOn": [
 				"[concat('Microsoft.Network/publicIPAddresses/', variables('openshiftMasterPublicIpDnsLabel'))]"
@@ -980,44 +974,18 @@
 						"protocol": "Tcp",
 						"loadDistribution": "SourceIP",
 						"idleTimeoutInMinutes": 30,
-						"frontendPort": 8443,
-						"backendPort": 8443,
+						"frontendPort": 443,
+						"backendPort": 443,
 						"probe": {
-							"id": "[variables('masterLb8443ProbeId')]"
-						}
-					}
-				}, {
-					"name": "CockpitConsole",
-					"properties": {
-						"frontendIPConfiguration": {
-							"id": "[variables('masterLbFrontEndConfigId')]"
-						},
-						"backendAddressPool": {
-							"id": "[variables('masterLbBackendPoolId')]"
-						},
-						"protocol": "Tcp",
-						"loadDistribution": "SourceIP",
-						"idleTimeoutInMinutes": 30,
-						"frontendPort": 9090,
-						"backendPort": 9090,
-						"probe": {
-							"id": "[variables('masterLbCockpitProbeId')]"
+							"id": "[variables('masterLbHttpsProbeId')]"
 						}
 					}
 				}],
 				"probes": [{
-					"name": "8443Probe",
+					"name": "httpsProbe",
 					"properties": {
 						"protocol": "Tcp",
-						"port": 8443,
-						"intervalInSeconds": 5,
-						"numberOfProbes": 2
-					}
-				}, {
-					"name": "cockpitProbe",
-					"properties": {
-						"protocol": "Tcp",
-						"port": 9090,
+						"port": 443,
 						"intervalInSeconds": 5,
 						"numberOfProbes": 2
 					}
@@ -1054,7 +1022,9 @@
 			"tags": {
 				"displayName": "OpenShiftInfraLB",
 				"provider": "[variables('redHatTags').provider]",
-				"app": "[variables('redHatTags').app]"
+				"app": "[variables('redHatTags').app]",
+				"version": "[variables('redHatTags').version]",
+				"platform": "[variables('redHatTags').platform]"
 			},
 			"dependsOn": [
 				"[concat('Microsoft.Network/publicIPAddresses/', variables('infraLbPublicIpDnsLabel'))]"
@@ -1103,22 +1073,6 @@
 							"id": "[variables('infraLbHttpsProbeId')]"
 						}
 					}
-				}, {
-					"name": "CockpitConsole",
-					"properties": {
-						"frontendIPConfiguration": {
-							"id": "[variables('infraLbFrontEndConfigId')]"
-						},
-						"backendAddressPool": {
-							"id": "[variables('infraLbBackendPoolId')]"
-						},
-						"protocol": "Tcp",
-						"frontendPort": 9090,
-						"backendPort": 9090,
-						"probe": {
-							"id": "[variables('infraLbCockpitProbeId')]"
-						}
-					}
 				}],
 				"probes": [{
 					"name": "httpProbe",
@@ -1136,14 +1090,6 @@
 						"intervalInSeconds": 5,
 						"numberOfProbes": 2
 					}
-				}, {
-					"name": "cockpitProbe",
-					"properties": {
-						"protocol": "Tcp",
-						"port": 9090,
-						"intervalInSeconds": 5,
-						"numberOfProbes": 2
-					}
 				}]
 			}
 		}, {
@@ -1154,7 +1100,9 @@
 			"tags": {
 				"displayName": "OpenShiftMasterNetworkInterface",
 				"provider": "[variables('redHatTags').provider]",
-				"app": "[variables('redHatTags').app]"
+				"app": "[variables('redHatTags').app]",
+				"version": "[variables('redHatTags').version]",
+				"platform": "[variables('redHatTags').platform]"
 			},
 			"dependsOn": [
 				"[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
@@ -1196,7 +1144,9 @@
 			"tags": {
 				"displayName": "OpenShiftInfraNetworkInterfaces",
 				"provider": "[variables('redHatTags').provider]",
-				"app": "[variables('redHatTags').app]"
+				"app": "[variables('redHatTags').app]",
+				"version": "[variables('redHatTags').version]",
+				"platform": "[variables('redHatTags').platform]"
 			},
 			"dependsOn": [
 				"[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
@@ -1232,7 +1182,9 @@
 			"tags": {
 				"displayName": "OpenShiftNodeNetworkInterfaces",
 				"provider": "[variables('redHatTags').provider]",
-				"app": "[variables('redHatTags').app]"
+				"app": "[variables('redHatTags').app]",
+				"version": "[variables('redHatTags').version]",
+				"platform": "[variables('redHatTags').platform]"
 			},
 			"dependsOn": [
 				"[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
@@ -1510,7 +1462,9 @@
 			"tags": {
 				"displayName": "PrepMaster",
 				"provider": "[variables('redHatTags').provider]",
-				"app": "[variables('redHatTags').app]"
+				"app": "[variables('redHatTags').app]",
+				"version": "[variables('redHatTags').version]",
+				"platform": "[variables('redHatTags').platform]"
 			},
 			"dependsOn": [
 				"[concat('masterVmDeployment', copyindex())]"
@@ -1541,7 +1495,9 @@
 			"tags": {
 				"displayName": "PrepInfra",
 				"provider": "[variables('redHatTags').provider]",
-				"app": "[variables('redHatTags').app]"
+				"app": "[variables('redHatTags').app]",
+				"version": "[variables('redHatTags').version]",
+				"platform": "[variables('redHatTags').platform]"
 			},
 			"dependsOn": [
 				"[concat('infraVmDeployment', copyindex())]"
@@ -1572,7 +1528,9 @@
 			"tags": {
 				"displayName": "PrepNodes",
 				"provider": "[variables('redHatTags').provider]",
-				"app": "[variables('redHatTags').app]"
+				"app": "[variables('redHatTags').app]",
+				"version": "[variables('redHatTags').version]",
+				"platform": "[variables('redHatTags').platform]"
 			},
 			"dependsOn": [
 				"[concat('nodeVmDeployment', copyindex())]"
@@ -1669,9 +1627,6 @@
 					"enableLogging": {
 						"value": "[parameters('enableLogging')]"
 					},
-					"enableCockpit": {
-						"value": "[parameters('enableCockpit')]"
-					},
 					"enableAzure": {
 						"value": "[parameters('enableAzure')]"
 					},
@@ -1708,7 +1663,7 @@
 	"outputs": {
 		"Openshift Console Url": {
 			"type": "string",
-			"value": "[concat('https://', reference(variables('openshiftMasterPublicIpDnsLabel')).dnsSettings.fqdn, ':8443/console')]"
+			"value": "[concat('https://', reference(variables('openshiftMasterPublicIpDnsLabel')).dnsSettings.fqdn, '/console')]"
 		},
 		"Openshift Master SSH": {
 			"type": "string",

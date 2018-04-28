@@ -19,7 +19,7 @@ Additional documentation for deploying OpenShift in Azure can be found here: htt
 
 Change log located in CHANGELOG.md
 
-## OpenShift Origin 3.7 with Username / Password
+## OpenShift Origin 3.9 with Username / Password
 
 To view all the default templates, please select from the openshift project.
 
