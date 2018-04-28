@@ -1,5 +1,13 @@
 This CHANGELOG.md file will contain the update log for the latest set of updates to the templates
 
+# UPDATES for Origin 3.9 - April 28, 2018
+
+1.  Update to deploy Origin 3.9.
+2.  Deploy ASB after cluster standup.
+3.  Extract playbook creation out of deployOpenShift.sh.
+4.  Tighten up creation of hosts file.
+
+
 # UPDATES for Origin 3.7 - February 19, 2018
 
 1.  Add additional label to infra nodes to address TSB install.
