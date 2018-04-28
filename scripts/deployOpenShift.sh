@@ -328,7 +328,11 @@ then
 	echo $(date) " - Rebooting cluster to complete installation"
 	runuser -l $SUDOUSER -c  "oc label --overwrite nodes $MASTER-0 openshift-infra=apiserver"
 	runuser -l $SUDOUSER -c  "oc label --overwrite nodes --all logging-infra-fluentd=true logging=true"
-	runuser -l $SUDOUSER -c "ansible-playbook -f 10 ~/openshift-container-platform-playbooks/reboot-master.yaml"
+	runuser -l $SUDOUSER -c  "ansible localhost -b  -m service -a 'name=openvswitch state=restarted'"
+	runuser -l $SUDOUSER -c  "ansible localhost -b  -m service -a 'name=origin-master-api state=restarted'"
+	runuser -l $SUDOUSER -c  "ansible localhost -b  -m service -a 'name=origin-master-controllers state=restarted'"
+	runuser -l $SUDOUSER -c  "ansible localhost -b  -m service -a 'name=origin-node state=restarted'"
+	runuser -l $SUDOUSER -c "ansible-playbook -f 10 ~/openshift-container-platform-playbooks/reboot-master-origin.yaml"
 	runuser -l $SUDOUSER -c "ansible-playbook -f 10 ~/openshift-container-platform-playbooks/reboot-nodes.yaml"
 
 	if [ $? -eq 0 ]
@@ -353,8 +357,6 @@ then
 	echo $(date) "- Service Catalog, Ansible Service Broker and Template Service Broker installed successfully"
 	
 fi
-
-
 
 # Configure Metrics
 
