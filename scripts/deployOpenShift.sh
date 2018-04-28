@@ -60,11 +60,26 @@ else
   exit 99
 fi
 
+# Create playbook to update ansible.cfg file
+
+cat > updateansiblecfg.yaml <<EOF
+#!/usr/bin/ansible-playbook
+
+- hosts: localhost
+  gather_facts: no
+  tasks:
+  - lineinfile:
+      dest: /etc/ansible/ansible.cfg
+      regexp: '^library '
+      insertafter: '#library        = /usr/share/my_modules/'
+      line: 'library = /home/${SUDOUSER}/openshift-ansible/library/'
+EOF
+
 # Run Ansible Playbook to update ansible.cfg file
 
 echo $(date) " - Updating ansible.cfg file"
 
-ansible-playbook /home/$SUDOUSER/openshift-container-platform-playbooks/updateansiblecfg-origin.yaml
+ansible-playbook ./updateansiblecfg.yaml
 
 # Create docker registry config based on Commercial Azure or Azure Government
 if [[ $CLOUD == "US" ]]
