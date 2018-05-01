@@ -220,6 +220,18 @@ echo $(date) " - Cloning openshift-ansible repo for use in installation"
 runuser -l $SUDOUSER -c "git clone -b release-3.9 https://github.com/openshift/openshift-ansible /home/$SUDOUSER/openshift-ansible"
 chmod -R 777 /home/$SUDOUSER/openshift-ansible
 
+echo $(date) " - Running network_manager.yml playbook"
+
+# Setup NetworkManager to manage eth0
+echo $(date) " - Setting up NetworkManager on eth0"
+DOMAIN=`domainname -d`
+runuser -l $SUDOUSER -c "ansible-playbook /home/$SUDOUSER/openshift-ansible/playbooks/openshift-node/network_manager.yml"
+
+sleep 20
+runuser -l $SUDOUSER -c "ansible all -b -m service -a \"name=NetworkManager state=restarted\""
+sleep 20
+runuser -l $SUDOUSER -c "ansible all -b -m command -a \"nmcli con modify eth0 ipv4.dns-search $DOMAIN\""
+runuser -l $SUDOUSER -c "ansible all -b -m service -a \"name=NetworkManager state=restarted\""
 
 # Create /etc/origin/cloudprovider/azure.conf on all hosts if Azure is enabled
 if [[ $AZURE == "true" ]]
@@ -233,19 +245,6 @@ then
 		exit 13
 	fi
 fi
-
-echo $(date) " - Running network_manager.yml playbook"
-
-# Setup NetworkManager to manage eth0
-echo $(date) " - Setting up NetworkManager on eth0"
-DOMAIN=`domainname -d`
-runuser -l $SUDOUSER -c "ansible-playbook /home/$SUDOUSER/openshift-ansible/playbooks/openshift-node/network_manager.yml"
-
-sleep 20
-runuser -l $SUDOUSER -c "ansible all -b -m service -a \"name=NetworkManager state=restarted\""
-sleep 20
-runuser -l $SUDOUSER -c "ansible all -b -m command -a \"nmcli con modify eth0 ipv4.dns-search $DOMAIN\""
-runuser -l $SUDOUSER -c "ansible all -b -m service -a \"name=NetworkManager state=restarted\""
 
 # Initiating installation of OpenShift Origin prerequisites using Ansible Playbook
 echo $(date) " - Running Prerequisites via Ansible Playbook"
