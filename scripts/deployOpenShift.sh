@@ -220,6 +220,10 @@ echo $(date) " - Cloning openshift-ansible repo for use in installation"
 runuser -l $SUDOUSER -c "git clone -b release-3.9 https://github.com/openshift/openshift-ansible /home/$SUDOUSER/openshift-ansible"
 chmod -R 777 /home/$SUDOUSER/openshift-ansible
 
+# Run a loop playbook to ensure DNS Hostname resolution is working prior to continuing with script
+echo $(date) " - Running DNS Hostname resolution check"
+runuser -l $SUDOUSER -c "ansible-playbook ~/openshift-container-platform-playbooks/check-dns-host-name-resolution.yaml"
+
 echo $(date) " - Running network_manager.yml playbook"
 
 # Setup NetworkManager to manage eth0
