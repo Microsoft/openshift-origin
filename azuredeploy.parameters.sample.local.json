@@ -3,16 +3,16 @@
 	"contentVersion": "1.0.0.0",
 	"parameters": {
 		"_artifactsLocation": {
-			"value": "https://raw.githubusercontent.com/Microsoft/openshift-origin/master/"
+			"value": "https://raw.githubusercontent.com/Microsoft/openshift-origin/master"
 		},
 		"masterVmSize": {
-			"value": "Standard_DS3_v2"
+			"value": "Standard_D4s_v3"
 		},
 		"infraVmSize": {
-			"value": "Standard_DS3_v2"
+			"value": "Standard_D4s_v3"
 		},
 		"nodeVmSize": {
-			"value": "Standard_DS3_v2"
+			"value": "Standard_D4s_v3"
 		},
 		"storageKind": {
 			"value": "managed"

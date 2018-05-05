@@ -4,9 +4,12 @@
 
 The master branch will now contain the most current release of OpenShift Origin with experimental items.  This may cause instability but will include new things or try new things.
 
+Re-introduced non-HA deployment option with 1 Master node.
+
 We now have branches for the stable releases:
 - release-3.6
 - release-3.7
+- release-3.9
 - azurestack-release-3.7
 - azurestack-release-3.9
 - etc.
@@ -35,7 +38,7 @@ This template deploys OpenShift Origin with basic username / password for authen
 |Storage Accounts <br />Managed Disks      |2 Storage Accounts for Diagnostics Logs <br />1 Storage Account for Private Docker Registry |
 |Network Security Groups|1 Network Security Group Master VMs<br />1 Network Security Group for Infra VMs<br />1 Network Security Group for Node VMs  |
 |Availability Sets      |1 Availability Set for Master VMs<br />1 Availability Set for Infra VMs<br />1 Availability Set for Node VMs  |
-|Virtual Machines   	|3 or 5 Masters. First Master is used to run Ansible Playbook to install OpenShift<br />2 or 3 Infra nodes<br />User-defined number of Nodes (1 to 30)<br />All VMs include a single attached data disk for Docker thin pool logical volume|
+|Virtual Machines   	|1, 3 or 5 Masters. First Master is used to run Ansible Playbook to install OpenShift<br />1, 2 or 3 Infra nodes<br />User-defined number of Nodes (1 to 30)<br />All VMs include a single attached data disk for Docker thin pool logical volume|
 
 If you have a Red Hat subscription and would like to deploy an OpenShift Container Platform (formerly OpenShift Enterprise) cluster, please visit: https://github.com/Microsoft/openshift-container-platform
 
@@ -121,7 +124,7 @@ The appId is used for the aadClientId parameter.
 8.  masterInstanceCount: Number of Masters nodes to deploy
 8.  infraInstanceCount: Number of infra nodes to deploy
 9.  nodeInstanceCount: Number of Nodes to deploy
-9.  dataDiskSize: Size of data disk to attach to nodes for Docker volume - valid sizes are 128 GB, 512 GB and 1023 GB
+9.  dataDiskSize: Size of data disk to attach to nodes for Docker volume - valid sizes are 32, 64, 128, 256, 512, 1024, 2048 (in GB)
 10. adminUsername: Admin username for both OS login and OpenShift login
 11. openshiftPassword: Password for OpenShift login
 11. enableMetrics: Enable Metrics - value is either "true" or "false"
