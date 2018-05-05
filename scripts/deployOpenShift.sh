@@ -118,8 +118,13 @@ do
 $NODE-$c openshift_node_labels=\"{'region': 'app', 'zone': 'default'}\" openshift_hostname=$NODE-$c"
 done
 
+# Set HA mode if 3 or 5 masters chosen
+if [[ $MASTERCOUNT != 1 ]]
+then
+	export HAMODE="openshift_master_cluster_method=native"
+fi
+
 # Setting the default openshift_cloudprovider_kind if Azure enabled
-# Disabling the Service Catalog if it isn't
 if [[ $AZURE == "true" ]]
 then
 	export CLOUDKIND="openshift_cloudprovider_kind=azure"
@@ -159,7 +164,7 @@ $CLOUDKIND
 openshift_router_selector='region=infra'
 openshift_registry_selector='region=infra'
 
-openshift_master_cluster_method=native
+$HAMODE
 openshift_master_cluster_hostname=$MASTERPUBLICIPHOSTNAME
 openshift_master_cluster_public_hostname=$MASTERPUBLICIPHOSTNAME
 openshift_master_cluster_public_vip=$MASTERPUBLICIPADDRESS
@@ -171,7 +176,7 @@ openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 
 openshift_enable_service_catalog=false
 
 # Disable the OpenShift SDN plugin
-openshift_use_openshift_sdn=true
+# openshift_use_openshift_sdn=true
 
 # Setup metrics
 openshift_metrics_install_metrics=false
@@ -181,11 +186,11 @@ openshift_metrics_startup_timeout=120
 openshift_metrics_hawkular_nodeselector={"region":"infra"}
 openshift_metrics_cassandra_nodeselector={"region":"infra"}
 openshift_metrics_heapster_nodeselector={"region":"infra"}
-#openshift_metrics_hawkular_hostname=https://hawkular-metrics.$ROUTING/hawkular/metrics
+# openshift_metrics_hawkular_hostname=https://hawkular-metrics.$ROUTING/hawkular/metrics
 
 # Setup logging
 openshift_logging_install_logging=false
-#openshift_logging_es_pvc_dynamic=true
+# openshift_logging_es_pvc_dynamic=true
 openshift_logging_es_pvc_storage_class_name=generic
 openshift_logging_fluentd_nodeselector={"logging":"true"}
 openshift_logging_es_nodeselector={"region":"infra"}
@@ -223,8 +228,7 @@ chmod -R 777 /home/$SUDOUSER/openshift-ansible
 # Run a loop playbook to ensure DNS Hostname resolution is working prior to continuing with script
 echo $(date) " - Running DNS Hostname resolution check"
 runuser -l $SUDOUSER -c "ansible-playbook ~/openshift-container-platform-playbooks/check-dns-host-name-resolution.yaml"
-
-echo $(date) " - Running network_manager.yml playbook"
+echo $(date) " - DNS Hostname resolution check complete"
 
 # Setup NetworkManager to manage eth0
 echo $(date) " - Setting up NetworkManager on eth0"
@@ -236,6 +240,7 @@ runuser -l $SUDOUSER -c "ansible all -b -m service -a \"name=NetworkManager stat
 sleep 20
 runuser -l $SUDOUSER -c "ansible all -b -m command -a \"nmcli con modify eth0 ipv4.dns-search $DOMAIN\""
 runuser -l $SUDOUSER -c "ansible all -b -m service -a \"name=NetworkManager state=restarted\""
+echo $(date) " - NetworkManager configuration complete"
 
 # Create /etc/origin/cloudprovider/azure.conf on all hosts if Azure is enabled
 if [[ $AZURE == "true" ]]
@@ -253,11 +258,14 @@ fi
 # Initiating installation of OpenShift Origin prerequisites using Ansible Playbook
 echo $(date) " - Running Prerequisites via Ansible Playbook"
 runuser -l $SUDOUSER -c "ansible-playbook -f 10 /home/$SUDOUSER/openshift-ansible/playbooks/prerequisites.yml"
+echo $(date) " - Prerequisites check complete"
 
 # Initiating installation of OpenShift Origin using Ansible Playbook
 echo $(date) " - Installing OpenShift Container Platform via Ansible Playbook"
 
 runuser -l $SUDOUSER -c "ansible-playbook -f 10 /home/$SUDOUSER/openshift-ansible/playbooks/deploy_cluster.yml"
+echo $(date) " - OpenShift Origin Cluster install complete"
+echo $(date) " - Running additional playbooks to finish configuring and installing other components"
 
 echo $(date) " - Modifying sudoers"
 
