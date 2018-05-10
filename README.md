@@ -196,7 +196,7 @@ Few options you have
   a. portal.azure.com -> choose 'Resource groups' select your group select 'Deployments' and there the deployment 'Microsoft.Template'. As output from the deployment it contains information about the openshift console url, ssh command and load balancer url.<br/>
   b. With the Azure CLI : 
     ```bash
-    azure group deployment list -g <resource group name>
+    az group deployment list -g <resource group name>
     ```
 3. Add additional users. you can find much detail about this in the openshift.org documentation under 'Cluster Administration' and 'Managing Users'. This installation uses htpasswd as the identity provider. To add more users, ssh in to each master node and execute following command:
    ```sh
