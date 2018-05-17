@@ -45,8 +45,8 @@ part_number=${name#*${rootdrivename}}
 growpart $rootdrive $part_number -u on
 xfs_growfs $rootdev
 
-# Install Docker 1.12.x
-echo $(date) " - Installing Docker 1.12.x"
+# Install Docker 1.13.x
+echo $(date) " - Installing Docker 1.13.x"
 
 yum -y install docker
 sed -i -e "s#^OPTIONS='--selinux-enabled'#OPTIONS='--selinux-enabled --insecure-registry 172.30.0.0/16'#" /etc/sysconfig/docker
