@@ -350,7 +350,7 @@
 		"redHatTags": {
 			"app": "OpenShiftOrigin",
 			"version": "3.9",
-			"platform": "AzureStack",
+			"platform": "AzurePublic",
 			"provider": "9d2c71fc-96ba-4b4a-93b3-14def5bc96fc"
 		},
 		"singlequote": "'",
@@ -1586,7 +1586,7 @@
 						"value": "[variables('newStorageAccountRegistry')]"
 					},
 					"newStorageAccountKey": {
-						"value": "[listKeys(variables('newStorageAccountRegistry'),'2015-06-15').key1]"
+						"value": "[listKeys(variables('newStorageAccountRegistry'), variables('apiVersionStorage')).keys[0].value]"
 					},
 					"openshiftMasterHostname": {
 						"value": "[variables('openshiftMasterHostname')]"
