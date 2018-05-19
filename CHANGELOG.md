@@ -1,11 +1,11 @@
 This CHANGELOG.md file will contain the update log for the latest set of updates to the templates
 
-#UPDATES for Origin 3.9 - May 18, 2018
+# UPDATES for Origin 3.9 - May 18, 2018
 
 1.  Adjust prep scripts and deployOpenShift script to correct NetworkManager configuration.
 
 
-#UPDATES for Origin 3.9 - May 5, 2018
+# UPDATES for Origin 3.9 - May 5, 2018
 
 1.  Support configuration for 1 Master as well as 1 Infra
 2.  Include playbook to test for DNS name resolution - accomodate for Azure network latency during deployment
