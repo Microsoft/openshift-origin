@@ -127,7 +127,10 @@ fi
 # Setting the default openshift_cloudprovider_kind if Azure enabled
 if [[ $AZURE == "true" ]]
 then
-	export CLOUDKIND="openshift_cloudprovider_kind=azure"
+	export CLOUDKIND="openshift_cloudprovider_kind=azure
+osm_controller_args={'cloud-provider': ['azure'], 'cloud-config': ['/etc/origin/cloudprovider/azure.conf']}
+osm_api_server_args={'cloud-provider': ['azure'], 'cloud-config': ['/etc/origin/cloudprovider/azure.conf']}
+openshift_node_kubelet_args={'cloud-provider': ['azure'], 'cloud-config': ['/etc/origin/cloudprovider/azure.conf'], 'enable-controller-attach-detach': ['true']}"
 fi
 
 # Create Ansible Hosts File
@@ -295,48 +298,48 @@ runuser $SUDOUSER -c "ansible-playbook -f 10 ~/openshift-container-platform-play
 
 if [[ $AZURE == "true" ]]
 then
-	# Execute setup-azure-master and setup-azure-node playbooks to configure Azure Cloud Provider
-	echo $(date) "- Configuring OpenShift Cloud Provider to be Azure"
+	Execute setup-azure-master and setup-azure-node playbooks to configure Azure Cloud Provider
+	# echo $(date) "- Configuring OpenShift Cloud Provider to be Azure"
 
-	runuser $SUDOUSER -c "ansible-playbook -f 10 ~/openshift-container-platform-playbooks/setup-azure-master-origin.yaml"
+	# runuser $SUDOUSER -c "ansible-playbook -f 10 ~/openshift-container-platform-playbooks/setup-azure-master-origin.yaml"
 
-	if [ $? -eq 0 ]
-	then
-	   echo $(date) " - Cloud Provider setup of master config on Master Nodes completed successfully"
-	else
-	   echo $(date) "- Cloud Provider setup of master config on Master Nodes failed to completed"
-	   exit 7
-	fi
+	# if [ $? -eq 0 ]
+	# then
+	   # echo $(date) " - Cloud Provider setup of master config on Master Nodes completed successfully"
+	# else
+	   # echo $(date) "- Cloud Provider setup of master config on Master Nodes failed to completed"
+	   # exit 7
+	# fi
 	
-	echo $(date) "- Sleep for 60"
+	# echo $(date) "- Sleep for 60"
 	
-	sleep 60
-	runuser $SUDOUSER -c "ansible-playbook -f 10 ~/openshift-container-platform-playbooks/setup-azure-node-master-origin.yaml"
+	# sleep 60
+	# runuser $SUDOUSER -c "ansible-playbook -f 10 ~/openshift-container-platform-playbooks/setup-azure-node-master-origin.yaml"
 
-	if [ $? -eq 0 ]
-	then
-	   echo $(date) " - Cloud Provider setup of node config on Master Nodes completed successfully"
-	else
-	   echo $(date) "- Cloud Provider setup of node config on Master Nodes failed to completed"
-	   exit 8
-	fi
+	# if [ $? -eq 0 ]
+	# then
+	   # echo $(date) " - Cloud Provider setup of node config on Master Nodes completed successfully"
+	# else
+	   # echo $(date) "- Cloud Provider setup of node config on Master Nodes failed to completed"
+	   # exit 8
+	# fi
 	
-	echo $(date) "- Sleep for 60"
+	# echo $(date) "- Sleep for 60"
 	
-	sleep 60
-	runuser $SUDOUSER -c "ansible-playbook -f 10 ~/openshift-container-platform-playbooks/setup-azure-node-origin.yaml"
+	# sleep 60
+	# runuser $SUDOUSER -c "ansible-playbook -f 10 ~/openshift-container-platform-playbooks/setup-azure-node-origin.yaml"
 
-	if [ $? -eq 0 ]
-	then
-	   echo $(date) " - Cloud Provider setup of node config on App Nodes completed successfully"
-	else
-	   echo $(date) "- Cloud Provider setup of node config on App Nodes failed to completed"
-	   exit 9
-	fi
+	# if [ $? -eq 0 ]
+	# then
+	   # echo $(date) " - Cloud Provider setup of node config on App Nodes completed successfully"
+	# else
+	   # echo $(date) "- Cloud Provider setup of node config on App Nodes failed to completed"
+	   # exit 9
+	# fi
 	
-	echo $(date) "- Sleep for 120"
+	# echo $(date) "- Sleep for 120"
 	
-	sleep 120
+	# sleep 120
 	
 	echo $(date) " - Rebooting cluster to complete installation"
 	runuser -l $SUDOUSER -c  "oc label --overwrite nodes $MASTER-0 openshift-infra=apiserver"
