@@ -1,5 +1,11 @@
 This CHANGELOG.md file will contain the update log for the latest set of updates to the templates
 
+# UPDATES for Origin 3.9 - July 13, 2018
+
+1.  Use CentOS 7.5 image.
+2.  Adjust deployOpenShift script to include Azure cloud provider setup for masters as part of integrated cluster setup.
+
+
 # UPDATES for Origin 3.9 - May 18, 2018
 
 1.  Adjust prep scripts and deployOpenShift script to correct NetworkManager configuration.
