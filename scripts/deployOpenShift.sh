@@ -48,12 +48,12 @@ echo $(date) "- Configuring SSH ControlPath to use shorter path name"
 sed -i -e "s/^# control_path = %(directory)s\/%%h-%%r/control_path = %(directory)s\/%%h-%%r/" /etc/ansible/ansible.cfg
 sed -i -e "s/^#host_key_checking = False/host_key_checking = False/" /etc/ansible/ansible.cfg
 sed -i -e "s/^#pty=False/pty=False/" /etc/ansible/ansible.cfg
+sed -i -e "s/^#stdout_callback = skippy/stdout_callback = skippy/" /etc/ansible/ansible.cfg
 
 # Cloning Ansible playbook repository
-(cd /home/$SUDOUSER && git clone https://github.com/Microsoft/openshift-container-platform-playbooks.git)
+((cd /home/$SUDOUSER && git clone https://github.com/Microsoft/openshift-container-platform-playbooks.git) || (cd openshift-container-platform-playbooks && git pull))
 if [ -d /home/${SUDOUSER}/openshift-container-platform-playbooks ]
 then
-  chmod -R 777 /home/$SUDOUSER/openshift-container-platform-playbooks
   echo " - Retrieved playbooks successfully"
 else
   echo " - Retrieval of playbooks failed"
@@ -127,7 +127,10 @@ fi
 # Setting the default openshift_cloudprovider_kind if Azure enabled
 if [[ $AZURE == "true" ]]
 then
-	export CLOUDKIND="openshift_cloudprovider_kind=azure"
+	export CLOUDKIND="openshift_cloudprovider_kind=azure
+osm_controller_args={'cloud-provider': ['azure'], 'cloud-config': ['/etc/origin/cloudprovider/azure.conf']}
+osm_api_server_args={'cloud-provider': ['azure'], 'cloud-config': ['/etc/origin/cloudprovider/azure.conf']}
+openshift_node_kubelet_args={'cloud-provider': ['azure'], 'cloud-config': ['/etc/origin/cloudprovider/azure.conf'], 'enable-controller-attach-detach': ['true']}"
 fi
 
 # Create Ansible Hosts File
@@ -295,49 +298,6 @@ runuser $SUDOUSER -c "ansible-playbook -f 10 ~/openshift-container-platform-play
 
 if [[ $AZURE == "true" ]]
 then
-	# Execute setup-azure-master and setup-azure-node playbooks to configure Azure Cloud Provider
-	echo $(date) "- Configuring OpenShift Cloud Provider to be Azure"
-
-	runuser $SUDOUSER -c "ansible-playbook -f 10 ~/openshift-container-platform-playbooks/setup-azure-master-origin.yaml"
-
-	if [ $? -eq 0 ]
-	then
-	   echo $(date) " - Cloud Provider setup of master config on Master Nodes completed successfully"
-	else
-	   echo $(date) "- Cloud Provider setup of master config on Master Nodes failed to completed"
-	   exit 7
-	fi
-	
-	echo $(date) "- Sleep for 60"
-	
-	sleep 60
-	runuser $SUDOUSER -c "ansible-playbook -f 10 ~/openshift-container-platform-playbooks/setup-azure-node-master-origin.yaml"
-
-	if [ $? -eq 0 ]
-	then
-	   echo $(date) " - Cloud Provider setup of node config on Master Nodes completed successfully"
-	else
-	   echo $(date) "- Cloud Provider setup of node config on Master Nodes failed to completed"
-	   exit 8
-	fi
-	
-	echo $(date) "- Sleep for 60"
-	
-	sleep 60
-	runuser $SUDOUSER -c "ansible-playbook -f 10 ~/openshift-container-platform-playbooks/setup-azure-node-origin.yaml"
-
-	if [ $? -eq 0 ]
-	then
-	   echo $(date) " - Cloud Provider setup of node config on App Nodes completed successfully"
-	else
-	   echo $(date) "- Cloud Provider setup of node config on App Nodes failed to completed"
-	   exit 9
-	fi
-	
-	echo $(date) "- Sleep for 120"
-	
-	sleep 120
-	
 	echo $(date) " - Rebooting cluster to complete installation"
 	runuser -l $SUDOUSER -c  "oc label --overwrite nodes $MASTER-0 openshift-infra=apiserver"
 	runuser -l $SUDOUSER -c  "oc label --overwrite nodes --all logging-infra-fluentd=true logging=true"
