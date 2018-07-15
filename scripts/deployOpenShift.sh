@@ -50,7 +50,7 @@ sed -i -e "s/^#host_key_checking = False/host_key_checking = False/" /etc/ansibl
 sed -i -e "s/^#pty=False/pty=False/" /etc/ansible/ansible.cfg
 
 # Cloning Ansible playbook repository
-(cd /home/$SUDOUSER && git clone https://github.com/Microsoft/openshift-container-platform-playbooks.git || cd openshift-container-platform-playbooks && git pull)
+((cd /home/$SUDOUSER && git clone https://github.com/Microsoft/openshift-container-platform-playbooks.git) || (cd openshift-container-platform-playbooks && git pull))
 if [ -d /home/${SUDOUSER}/openshift-container-platform-playbooks ]
 then
   echo " - Retrieved playbooks successfully"
