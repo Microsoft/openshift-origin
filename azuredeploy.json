@@ -1661,15 +1661,15 @@
 		}
 	],
 	"outputs": {
-		"Openshift Console Url": {
+		"OpenShift Console Url": {
 			"type": "string",
 			"value": "[concat('https://', reference(variables('openshiftMasterPublicIpDnsLabel')).dnsSettings.fqdn, '/console')]"
 		},
-		"Openshift Master SSH": {
+		"OpenShift Master SSH": {
 			"type": "string",
 			"value": "[concat('ssh -p 2200 ', parameters('adminUsername'), '@', reference(variables('openshiftMasterPublicIpDnsLabel')).dnsSettings.fqdn)]"
 		},
-		"Openshift Infra Load Balancer FQDN": {
+		"OpenShift Infra Load Balancer FQDN": {
 			"type": "string",
 			"value": "[reference(variables('infraLbPublicIpDnsLabel')).dnsSettings.fqdn]"
 		}
