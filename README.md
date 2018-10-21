@@ -115,29 +115,31 @@ The appId is used for the aadClientId parameter.
 
 ### azuredeploy.Parameters.json File Explained
 
-1.  _artifactsLocation: The base URL where artifacts required by this template are located. If you are using your own fork of the repo and want the deployment to pick up artifacts from your fork, update this value appropriately (user and branch), for example, change from `https://raw.githubusercontent.com/Microsoft/openshift-origin/master/` to `https://raw.githubusercontent.com/YourUser/openshift-origin/YourBranch/`
-2.  masterVmSize: Size of the Master VM. Select from one of the allowed VM sizes listed in the azuredeploy.json file
-3.  infraVmSize: Size of the Infra VM. Select from one of the allowed VM sizes listed in the azuredeploy.json file
-3.  nodeVmSize: Size of the Node VM. Select from one of the allowed VM sizes listed in the azuredeploy.json file
-4.  storageKind: The type of storage to be used. Value is either "managed" or "unmanaged"
-5.  openshiftClusterPrefix: Cluster Prefix used to configure hostnames for all nodes - master, infra and nodes. Between 1 and 20 characters
-8.  masterInstanceCount: Number of Masters nodes to deploy
-8.  infraInstanceCount: Number of infra nodes to deploy
-9.  nodeInstanceCount: Number of Nodes to deploy
-9.  dataDiskSize: Size of data disk to attach to nodes for Docker volume - valid sizes are 32, 64, 128, 256, 512, 1024, 2048 (in GB)
-10. adminUsername: Admin username for both OS login and OpenShift login
-11. openshiftPassword: Password for OpenShift login
-11. enableMetrics: Enable Metrics - value is either "true" or "false"
-11. enableLogging: Enable Logging - value is either "true" or "false"
-12. sshPublicKey: Copy your SSH Public Key here
-14. keyVaultResourceGroup: The name of the Resource Group that contains the Key Vault
-15. keyVaultName: The name of the Key Vault you created
-16. keyVaultSecret: The Secret Name you used when creating the Secret (that contains the Private Key)
-18. enableAzure: Enable Azure Cloud Provider - value is either "true" or "false"
-18. aadClientId: Azure Active Directory Client ID also known as Application ID for Service Principal
-18. aadClientSecret: Azure Active Directory Client Secret for Service Principal
-17. defaultSubDomainType: This will either be nipio (if you don't have your own domain) or custom if you have your own domain that you would like to use for routing
-18. defaultSubDomain: The wildcard DNS name you would like to use for routing if you selected custom above.  If you selected nipio above, then this field will be ignored
+| Property                          | Description                                                                                                                                                                                                                                                                                                                                          | Valid options                                                                        | Default value |
+|-----------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------|---------------|
+`_artifactsLocation`| The base URL where artifacts required by this template are located. If you are using your own fork of the repo and want the deployment to pick up artifacts from your fork, update this value appropriately (user and branch), for example, change from `https://raw.githubusercontent.com/Microsoft/openshift-origin/master/` to `https://raw.githubusercontent.com/YourUser/openshift-origin/YourBranch/`
+`masterVmSize`| Size of the Master VM. Select from one of the allowed VM sizes listed in the azuredeploy.json file ||
+`infraVmSize`| Size of the Infra VM. Select from one of the allowed VM sizes listed in the azuredeploy.json file ||
+`nodeVmSize`| Size of the Node VM. Select from one of the allowed VM sizes listed in the azuredeploy.json file||
+`storageKind`| The type of storage to be used. | - "managed"<br>- "unmanaged"|
+`openshiftClusterPrefix`| Cluster Prefix used to configure hostnames for all nodes - master, infra and nodes. Between 1 and 20 characters||
+`masterInstanceCount`| Number of Masters nodes to deploy||
+`infraInstanceCount`| Number of infra nodes to deploy||
+`nodeInstanceCount`| Number of Nodes to deploy||
+`dataDiskSize`| Size of data disk to attach to nodes for Docker volume.|- 32 GB<br>- 64 GB<br>- 128 GB<br>- 256 GB<br>- 512 GB<br>- 1024 GB<br>- 2048 GB|
+`adminUsername`| Admin username for both OS login and OpenShift login||
+`openshiftPassword`| Password for OpenShift login||
+`enableMetrics`| Enable Metrics|- "true"<br>- "false|
+`enableLogging`| Enable Logging|- "true"<br>- "false|
+`sshPublicKey`| Copy your SSH Public Key here||
+`keyVaultResourceGroup`| The name of the Resource Group that contains the Key Vault||
+`keyVaultName`| The name of the Key Vault you created||
+`keyVaultSecret`| The Secret Name you used when creating the Secret (that contains the Private Key)||
+`enableAzure`| Enable Azure Cloud Provider|- "true"<br>- "false|
+`aadClientId`| Azure Active Directory Client ID also known as Application ID for Service Principal||
+`aadClientSecret`| Azure Active Directory Client Secret for Service Principal||
+`defaultSubDomainType`| This will either be nipio (if you don't have your own domain) or custom if you have your own domain that you would like to use for routing||
+`defaultSubDomain`| The wildcard DNS name you would like to use for routing if you selected custom above.  If you selected nipio above, then this field will be ignored||
 
 ## Deploy Template
 
