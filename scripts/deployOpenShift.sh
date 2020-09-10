@@ -28,6 +28,8 @@ export METRICS=${21}
 export LOGGING=${22}
 export AZURE=${23}
 export STORAGEKIND=${24}
+export ETCDCOUNT=${25}
+export ETCD=${26}
 
 # Determine if Commercial Azure or Azure Government
 CLOUD=$( curl -H Metadata:true "http://169.254.169.254/metadata/instance/compute/location?api-version=2017-04-02&format=text" | cut -c 1-2 )
@@ -36,6 +38,7 @@ export CLOUD=${CLOUD^^}
 export MASTERLOOP=$((MASTERCOUNT - 1))
 export INFRALOOP=$((INFRACOUNT - 1))
 export NODELOOP=$((NODECOUNT - 1))
+export ETCDLOOP=$((ETCDCOUNT - 1))
 
 # Generate private keys for use by Ansible
 echo $(date) " - Generating Private keys for use by Ansible for OpenShift Installation"
@@ -118,6 +121,15 @@ for (( c=0; c<$NODECOUNT; c++ ))
 do
   nodegroup="$nodegroup
 $NODE-$c openshift_node_labels=\"{'region': 'app', 'zone': 'default'}\" openshift_hostname=$NODE-$c"
+done
+
+# Create ETCD grouping
+echo $(date) " - Creating ETCD grouping"
+
+for (( c=0; c<$ETCDCOUNT; c++ ))
+do
+  etcdgroup="$etcdgroup
+$ETCD-$c openshift_node_labels=\"{'region': 'etcd', 'zone': 'default'}\" openshift_hostname=$ETCD-$c"
 done
 
 # Set HA mode if 3 or 5 masters chosen
@@ -210,7 +222,8 @@ $MASTER-[0:${MASTERLOOP}]
 
 # host group for etcd
 [etcd]
-$MASTER-[0:${MASTERLOOP}]
+#$MASTER-[0:${MASTERLOOP}]
+$ETCD-[0:${ETCDLOOP}]
 
 [master0]
 $MASTER-0

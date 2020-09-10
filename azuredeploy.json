@@ -8,7 +8,7 @@
 				"description": "The base URL where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated.",
 				"artifactsBaseUrl": ""
 			},
-			"defaultValue": "https://raw.githubusercontent.com/Microsoft/openshift-origin/master"
+			"defaultValue": "https://raw.githubusercontent.com/sreedharbikki/openshift-origin/scripts_for_OKD_3_11"
 		},
 		"masterVmSize": {
 			"type": "string",
@@ -56,6 +56,30 @@
 			],
 			"metadata": {
 				"description": "OpenShift Node VM(s) size"
+			}
+		},
+		"etcdVmSize": {
+			"type": "string",
+			"defaultValue": "Standard_DS3_v2",
+			"allowedValues": [
+				"Standard_A4", "Standard_A5", "Standard_A6", "Standard_A7", "Standard_A8", "Standard_A9", "Standard_A10", "Standard_A11",
+				"Standard_D1", "Standard_D2", "Standard_D3", "Standard_D4",
+				"Standard_D11", "Standard_D12", "Standard_D13", "Standard_D14",
+				"Standard_D1_v2", "Standard_D2_v2", "Standard_D3_v2", "Standard_D4_v2", "Standard_D5_v2",
+				"Standard_D11_v2", "Standard_D12_v2", "Standard_D13_v2", "Standard_D14_v2",
+				"Standard_G1", "Standard_G2", "Standard_G3", "Standard_G4", "Standard_G5",
+				"Standard_D1_v2", "Standard_DS2", "Standard_DS3", "Standard_DS4",
+				"Standard_DS11", "Standard_DS12", "Standard_DS13", "Standard_DS14",
+				"Standard_DS1_v2", "Standard_DS2_v2", "Standard_DS3_v2", "Standard_DS4_v2", "Standard_DS5_v2",
+				"Standard_DS11_v2", "Standard_DS12_v2", "Standard_DS13_v2", "Standard_DS14_v2",
+				"Standard_GS1", "Standard_GS2", "Standard_GS3", "Standard_GS4", "Standard_GS5",
+				"Standard_D2_v3", "Standard_D4_v3", "Standard_D8_v3", "Standard_D16_v3", "Standard_D32_v3", "Standard_D64_v3",
+				"Standard_D2s_v3", "Standard_D4s_v3", "Standard_D8s_v3", "Standard_D16s_v3", "Standard_D32s_v3", "Standard_D64s_v3",
+				"Standard_E2_v3", "Standard_E4_v3", "Standard_E8_v3", "Standard_E16_v3", "Standard_E32_v3", "Standard_E64_v3",
+				"Standard_E2s_v3", "Standard_E4s_v3", "Standard_E8s_v3", "Standard_E16s_v3", "Standard_E32s_v3", "Standard_E64s_v3"
+			],
+			"metadata": {
+				"description": "OpenShift Etcd VM(s) size"
 			}
 		},
 		"infraVmSize": {
@@ -121,6 +145,14 @@
 			"allowedValues": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30],
 			"metadata": {
 				"description": "Number of OpenShift nodes"
+			}
+		},
+		"etcdInstanceCount": {
+			"type": "int",
+			"defaultValue": 2,
+			"allowedValues": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30],
+			"metadata": {
+				"description": "Number of OpenShift etcd nodes"
 			}
 		},
 		"dataDiskSize": {
@@ -246,11 +278,14 @@
 		"namingInfix": "[toLower(parameters('openshiftClusterPrefix'))]",
 		"openshiftMasterHostname": "[concat(variables('namingInfix'), '-master')]",
 		"openshiftNodeHostname": "[concat(variables('namingInfix'), '-node')]",
+		"openshiftEtcdHostname": "[concat(variables('namingInfix'), '-etcd')]",
 		"openshiftInfraHostname": "[concat(variables('namingInfix'), '-infra')]",
 		"newStorageAccountMaster": "[concat('master', uniqueString(concat(resourceGroup().id, 'msa')))]",
 		"newStorageAccountInfra": "[concat('infra', uniqueString(concat(resourceGroup().id, 'infra')))]",
 		"newStorageAccountNodeOs": "[concat('nodeos', uniqueString(concat(resourceGroup().id, 'nodeossa')))]",
 		"newStorageAccountNodeData": "[concat('nodedata', uniqueString(concat(resourceGroup().id, 'nodedatasa')))]",
+		"newStorageAccountEtcdOs": "[concat('etcdos', uniqueString(concat(resourceGroup().id, 'etcdossa')))]",
+		"newStorageAccountEtcdData": "[concat('etcddata', uniqueString(concat(resourceGroup().id, 'etcddatasa')))]",
 		"diagStorageAccount1": "[concat('diag1', uniqueString(concat(resourceGroup().id, 'dsa1')))]",
 		"diagStorageAccount2": "[concat('diag2', uniqueString(concat(resourceGroup().id, 'dsa2')))]",
 		"newStorageAccountRegistry": "[concat('registry', uniqueString(concat(resourceGroup().id, 'registry')))]",
@@ -263,12 +298,15 @@
 			{ "name": "[variables('newStorageAccountInfra')]", "tagName": "InfraStorageAccount", "skuName": "[variables('storageSkuObject').infra.skuName]", "skuTier": "[variables('storageSkuObject').infra.skuTier]" },
 			{ "name": "[variables('newStorageAccountNodeOs')]", "tagName": "NodeStorageAccount", "skuName": "[variables('storageSkuObject').node.skuName]", "skuTier": "[variables('storageSkuObject').node.skuTier]" },
 			{ "name": "[variables('newStorageAccountNodeData')]", "tagName": "NodeStorageAccount", "skuName": "[variables('storageSkuObject').node.skuName]", "skuTier": "[variables('storageSkuObject').node.skuTier]" },
+			{ "name": "[variables('newStorageAccountEtcdOs')]", "tagName": "EtcdStorageAccount", "skuName": "[variables('storageSkuObject').etcd.skuName]", "skuTier": "[variables('storageSkuObject').etcd.skuTier]" },
+			{ "name": "[variables('newStorageAccountEtcdData')]", "tagName": "EtcdStorageAccount", "skuName": "[variables('storageSkuObject').etcd.skuName]", "skuTier": "[variables('storageSkuObject').etcd.skuTier]" },
 			{ "name": "[variables('newStorageAccountPersistentVolume1')]", "tagName": "PersistentVolume1StorageAccount", "skuName": "[variables('storageSkuObject').persistent.skuName]", "skuTier": "[variables('storageSkuObject').persistent.skuTier]" }
 		],
 		"availabilitySetArray": [
 			{ "name": "masteravailabilityset", "tagName": "MasterAvailabilitySet" },
 			{ "name": "infraavailabilityset", "tagName": "InfraAvailabilitySet" },
-			{ "name": "nodeavailabilityset", "tagName": "NodeAvailabilitySet" }
+			{ "name": "nodeavailabilityset", "tagName": "NodeAvailabilitySet" },
+			{ "name": "etcdavailabilityset", "tagName": "EtcdAvailabilitySet" }
 		],
 		"unmanagedAvailabilitySetSku": "Classic",
 		"managedAvailabilitySetSku": "Aligned",
@@ -288,6 +326,10 @@
 			"node": {
 				"skuName": "[variables('vmSizesMap')[parameters('nodeVmSize')].storageAccountType]",
 				"skuTier": "[variables('vmSizesMap')[parameters('nodeVmSize')].storageAccountTier]"
+			},
+			"etcd": {
+				"skuName": "[variables('vmSizesMap')[parameters('etcdVmSize')].storageAccountType]",
+				"skuTier": "[variables('vmSizesMap')[parameters('etcdVmSize')].storageAccountTier]"
 			},
 			"diagnostics": {
 				"skuName": "Standard_LRS",
@@ -313,16 +355,24 @@
 		"managedNodeOsUri": "[variables('diagStorageAccount1')]",
 		"unmanagedNodeDataUri": "[variables('newStorageAccountNodeData')]",
 		"managedNodeDataUri": "[variables('diagStorageAccount1')]",
+		"unmanagedEtcdOsUri": "[variables('newStorageAccountEtcdOs')]",
+		"managedEtcdOsUri": "[variables('diagStorageAccount1')]",
+		"unmanagedEtcdDataUri": "[variables('newStorageAccountEtcdData')]",
+		"managedEtcdDataUri": "[variables('diagStorageAccount1')]",
 		"masterUri": "[concat(parameters('storageKind'), 'MasterUri')]",
 		"infraUri": "[concat(parameters('storageKind'), 'InfraUri')]",
 		"nodeOsUri": "[concat(parameters('storageKind'), 'NodeOsUri')]",
 		"nodeDataUri": "[concat(parameters('storageKind'), 'NodeDataUri')]",
+		"etcdOsUri": "[concat(parameters('storageKind'), 'EtcdOsUri')]",
+		"etcdDataUri": "[concat(parameters('storageKind'), 'EtcdDataUri')]",
 		"addressPrefix": "10.0.0.0/8",
 		"masterSubnetPrefix": "10.1.0.0/16",
 		"nodeSubnetPrefix": "10.2.0.0/16",
+		"etcdSubnetPrefix": "10.3.0.0/16",
 		"virtualNetworkName": "openshiftvnet",
 		"masterSubnetName": "mastersubnet",
 		"nodeSubnetName": "nodesubnet",
+		"etcdSubnetName": "etcdsubnet",
 		"infraLbPublicIpDnsLabel": "[concat('infradns', uniqueString(concat(resourceGroup().id, 'infra')))]",
 		"openshiftMasterPublicIpDnsLabel": "[concat('masterdns', uniqueString(concat(resourceGroup().id, 'master')))]",
 
@@ -826,6 +876,60 @@
 				}]
 			}
 		}, {
+			"apiVersion": "[variables('apiVersionNetwork')]",
+			"type": "Microsoft.Network/networkSecurityGroups",
+			"name": "[concat(variables('openshiftEtcdHostname'), '-nsg')]",
+			"location": "[variables('location')]",
+			"tags": {
+				"displayName": "EtcdNSG",
+				"provider": "[variables('redHatTags').provider]",
+				"app": "[variables('redHatTags').app]",
+				"version": "[variables('redHatTags').version]",
+				"platform": "[variables('redHatTags').platform]"
+			},
+			"properties": {
+				"securityRules": [{
+					"name": "allowSSHin_all",
+					"properties": {
+						"description": "Allow SSH in from all locations",
+						"protocol": "Tcp",
+						"sourcePortRange": "*",
+						"destinationPortRange": "22",
+						"sourceAddressPrefix": "*",
+						"destinationAddressPrefix": "*",
+						"access": "Allow",
+						"priority": 100,
+						"direction": "Inbound"
+					}
+				}, {
+					"name": "allowHTTPS_all",
+					"properties": {
+						"description": "Allow HTTPS connections from all locations",
+						"protocol": "Tcp",
+						"sourcePortRange": "*",
+						"destinationPortRange": "443",
+						"sourceAddressPrefix": "*",
+						"destinationAddressPrefix": "*",
+						"access": "Allow",
+						"priority": 200,
+						"direction": "Inbound"
+					}
+				}, {
+					"name": "allowHTTPIn_all",
+					"properties": {
+						"description": "Allow HTTP connections from all locations",
+						"protocol": "Tcp",
+						"sourcePortRange": "*",
+						"destinationPortRange": "80",
+						"sourceAddressPrefix": "*",
+						"destinationAddressPrefix": "*",
+						"access": "Allow",
+						"priority": 300,
+						"direction": "Inbound"
+					}
+				}]
+			}
+		}, {
 			"type": "Microsoft.Network/virtualNetworks",
 			"name": "[variables('virtualNetworkName')]",
 			"location": "[variables('location')]",
@@ -852,6 +956,11 @@
 					"name": "[variables('nodeSubnetName')]",
 					"properties": {
 						"addressPrefix": "[variables('nodeSubnetPrefix')]"
+					}
+				}, {
+					"name": "[variables('etcdSubnetName')]",
+					"properties": {
+						"addressPrefix": "[variables('etcdSubnetPrefix')]"
 					}
 				}]
 			}
@@ -1209,6 +1318,40 @@
 				}
 			}
 		}, {
+			"type": "Microsoft.Network/networkInterfaces",
+			"name": "[concat(variables('openshiftEtcdHostname'), '-', copyIndex(), '-nic')]",
+			"location": "[variables('location')]",
+			"apiVersion": "[variables('apiVersionNetwork')]",
+			"tags": {
+				"displayName": "OpenShiftEtcdNetworkInterfaces",
+				"provider": "[variables('redHatTags').provider]",
+				"app": "[variables('redHatTags').app]",
+				"version": "[variables('redHatTags').version]",
+				"platform": "[variables('redHatTags').platform]"
+			},
+			"dependsOn": [
+				"[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
+				"[concat('Microsoft.Network/networkSecurityGroups/', variables('openshiftEtcdHostname'), '-nsg')]"
+			],
+			"copy": {
+				"name": "etcdNicLoop",
+				"count": "[parameters('etcdInstanceCount')]"
+			},
+			"properties": {
+				"ipConfigurations": [{
+					"name": "[concat(variables('openshiftEtcdHostname'), copyIndex(), 'ipconfig')]",
+					"properties": {
+						"privateIPAllocationMethod": "Dynamic",
+						"subnet": {
+							"id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'), '/subnets/', variables('etcdSubnetName'))]"
+						}
+					}
+				}],
+				"networkSecurityGroup": {
+					"id": "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('openshiftEtcdHostname'), '-nsg'))]"
+				}
+			}
+		}, {
 			"name": "[concat('masterVmDeployment', copyindex())]",
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "[variables('apiVersionLinkTemplate')]",
@@ -1455,6 +1598,88 @@
 				}
 			}
 		}, {
+			"name": "[concat('etcdVmDeployment', copyindex())]",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "[variables('apiVersionLinkTemplate')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Storage/storageAccounts', variables('diagStorageAccount2'))]",
+				"etcdNicLoop",
+				"etcdavailabilityset"
+			],
+			"copy": {
+				"name": "etcdVmLoop",
+				"count": "[parameters('etcdInstanceCount')]"
+			},
+			"properties": {
+				"mode": "Incremental",
+				"templateLink": {
+					"uri": "[variables('clusterNodeDeploymentTemplateUrl')]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"location": {
+						"value": "[variables('location')]"
+					},
+					"sshKeyPath": {
+						"value": "[variables('sshKeyPath')]"
+					},
+					"sshPublicKey": {
+						"value": "[parameters('sshPublicKey')]"
+					},
+					"dataDiskSize": {
+						"value": "[parameters('dataDiskSize')]"
+					},
+					"adminUsername": {
+						"value": "[parameters('adminUsername')]"
+					},
+					"vmSize": {
+						"value": "[parameters('etcdVmSize')]"
+					},
+					"availabilitySet": {
+						"value": "etcdavailabilityset"
+					},
+					"hostname": {
+						"value": "[concat(variables('openshiftEtcdHostname'), '-', copyIndex())]"
+					},
+					"unmanagedOsDiskUri": {
+						"value": "[reference(resourceId(resourceGroup().name, 'Microsoft.Storage/storageAccounts', variables(variables('etcdOsUri'))), variables('apiVersionStorage')).primaryEndpoints['blob']]"
+					},
+					"unmanagedDataDiskUri": {
+						"value": "[reference(resourceId(resourceGroup().name, 'Microsoft.Storage/storageAccounts', variables(variables('etcdDataUri'))), variables('apiVersionStorage')).primaryEndpoints['blob']]"
+					},
+					"role": {
+						"value": "etcdnode"
+					},
+					"vmStorageType": {
+						"value": "[variables('vmSizesMap')[parameters('etcdVmSize')].storageAccountType]"
+					},
+					"storageKind": {
+						"value": "[parameters('storageKind')]"
+					},
+					"newStorageAccountOs": {
+						"value": "[variables('newStorageAccountEtcdOs')]"
+					},
+					"newStorageAccountData": {
+						"value": "[variables('newStorageAccountEtcdData')]"
+					},
+					"diagStorageAccount": {
+						"value": "[variables('diagStorageAccount2')]"
+					},
+					"apiVersionStorage": {
+						"value": "[variables('apiVersionStorage')]"
+					},
+					"apiVersionCompute": {
+						"value": "[variables('apiVersionCompute')]"
+					},
+					"imageReference": {
+						"value": "[variables('imageReference')]"
+					},
+					"redHatTags": {
+						"value": "[variables('redHatTags')]"
+					}
+				}
+			}
+		}, {
 			"type": "Microsoft.Compute/virtualMachines/extensions",
 			"name": "[concat(variables('openshiftMasterHostname'), '-', copyIndex(), '/deployOpenShift')]",
 			"location": "[variables('location')]",
@@ -1554,6 +1779,39 @@
 				}
 			}
 		}, {
+			"type": "Microsoft.Compute/virtualMachines/extensions",
+			"name": "[concat(variables('openshiftEtcdHostname'), '-', copyIndex(), '/prepNodes')]",
+			"location": "[variables('location')]",
+			"apiVersion": "[variables('apiVersionCompute')]",
+			"tags": {
+				"displayName": "PrepEtcd",
+				"provider": "[variables('redHatTags').provider]",
+				"app": "[variables('redHatTags').app]",
+				"version": "[variables('redHatTags').version]",
+				"platform": "[variables('redHatTags').platform]"
+			},
+			"dependsOn": [
+				"[concat('etcdVmDeployment', copyindex())]"
+			],
+			"copy": {
+				"name": "etcdPrepLoop",
+				"count": "[parameters('etcdInstanceCount')]"
+			},
+			"properties": {
+				"publisher": "Microsoft.Azure.Extensions",
+				"type": "CustomScript",
+				"typeHandlerVersion": "2.0",
+				"autoUpgradeMinorVersion": true,
+				"settings": {
+					"fileUris": [
+						"[variables('nodePrepScriptUrl')]"
+					]
+				},
+				"protectedSettings": {
+					"commandToExecute": "[concat('bash ', variables('nodePrepScriptFileName'))]"
+				}
+			}
+		}, {
 			"name": "OpenShiftDeployment",
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "[variables('apiVersionLinkTemplate')]",
@@ -1561,7 +1819,8 @@
 				"[resourceId('Microsoft.Storage/storageAccounts', variables('newStorageAccountRegistry'))]",
 				"masterPrepLoop",
 				"infraPrepLoop",
-				"nodePrepLoop"
+				"nodePrepLoop",
+				"etcdPrepLoop"
 			],
 			"properties": {
 				"mode": "Incremental",
@@ -1603,6 +1862,9 @@
 					"openshiftNodeHostname": {
 						"value": "[variables('openshiftNodeHostname')]"
 					},
+					"openshiftEtcdHostname": {
+						"value": "[variables('openshiftEtcdHostname')]"
+					},
 					"masterInstanceCount": {
 						"value": "[parameters('masterInstanceCount')]"
 					},
@@ -1611,6 +1873,9 @@
 					},
 					"nodeInstanceCount": {
 						"value": "[parameters('nodeInstanceCount')]"
+					},
+					"etcdInstanceCount": {
+						"value": "[parameters('etcdInstanceCount')]"
 					},
 					"storageKind": {
 						"value": "[parameters('storageKind')]"

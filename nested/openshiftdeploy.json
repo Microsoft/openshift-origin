@@ -68,6 +68,12 @@
 				"description": "OpenShift Node hostname"
 			}
 		},
+		"openshiftEtcdHostname": {
+			"type": "string",
+			"metadata": {
+				"description": "OpenShift Etcd hostname"
+			}
+		},
 		"masterInstanceCount": {
 			"type": "int",
 			"metadata": {
@@ -84,6 +90,12 @@
 			"type": "int",
 			"metadata": {
 				"description": "Number of OpenShift nodes"
+			}
+		},
+		"etcdInstanceCount": {
+			"type": "int",
+			"metadata": {
+				"description": "Number of OpenShift etcd nodes"
 			}
 		},
 		"storageKind": {
@@ -173,7 +185,7 @@
 		"tenantId": "[subscription().tenantId]",
 		"subscriptionId": "[subscription().subscriptionId]",
 		"location": "[resourceGroup().location]",
-		"resourceGroupName": "[resourceGroup().name]",
+		"resourceGroupName": "[resourceGroup().name]"
 	},
 	"resources": [{
 		"type": "Microsoft.Compute/virtualMachines/extensions",
@@ -198,7 +210,7 @@
 				]
 			},
 			"protectedSettings": {
-				"commandToExecute": "[concat('bash ', parameters('openshiftDeploymentScriptFileName'), ' \"', parameters('adminUsername'), '\" ', variables('singlequote'), parameters('openshiftPassword'), variables('singlequote'), ' \"', parameters('sshPrivateKey'), '\" \"', parameters('openshiftMasterHostname'), '\" \"', parameters('openshiftMasterPublicIpFqdn'), '\" \"', parameters('openshiftMasterPublicIpAddress'), '\" \"', parameters('openshiftInfraHostname'), '\" \"', parameters('openshiftNodeHostname'), '\" \"', parameters('nodeInstanceCount'), '\" \"', parameters('infraInstanceCount'), '\" \"', parameters('MasterInstanceCount'), '\" \"', parameters(parameters('subDomainChosen')), '\" \"', parameters('newStorageAccountRegistry'), '\" ', variables('singlequote'), parameters('newStorageAccountKey'), variables('singlequote'), ' ', variables('singlequote'), variables('tenantId'), variables('singlequote'), ' ', variables('singlequote'), variables('subscriptionId'), variables('singlequote'), ' ', variables('singlequote'), parameters('aadClientId'), variables('singlequote'), ' ', variables('singlequote'), parameters('aadClientSecret'), variables('singlequote'), ' ', variables('singlequote'), variables('resourceGroupName'), variables('singlequote'), ' ', variables('singlequote'), variables('location'), variables('singlequote'), ' ', variables('singlequote'), parameters('enableMetrics'), variables('singlequote'), ' ', variables('singlequote'), parameters('enableLogging'), variables('singlequote'), ' ', variables('singlequote'), parameters('enableAzure'), variables('singlequote'), ' ', variables('singlequote'), parameters('storageKind'), variables('singlequote'))]"
+				"commandToExecute": "[concat('bash ', parameters('openshiftDeploymentScriptFileName'), ' \"', parameters('adminUsername'), '\" ', variables('singlequote'), parameters('openshiftPassword'), variables('singlequote'), ' \"', parameters('sshPrivateKey'), '\" \"', parameters('openshiftMasterHostname'), '\" \"', parameters('openshiftMasterPublicIpFqdn'), '\" \"', parameters('openshiftMasterPublicIpAddress'), '\" \"', parameters('openshiftInfraHostname'), '\" \"', parameters('openshiftNodeHostname'), '\" \"', parameters('nodeInstanceCount'), '\" \"', parameters('infraInstanceCount'), '\" \"', parameters('MasterInstanceCount'), '\" \"', parameters(parameters('subDomainChosen')), '\" \"', parameters('newStorageAccountRegistry'), '\" ', variables('singlequote'), parameters('newStorageAccountKey'), variables('singlequote'), ' ', variables('singlequote'), variables('tenantId'), variables('singlequote'), ' ', variables('singlequote'), variables('subscriptionId'), variables('singlequote'), ' ', variables('singlequote'), parameters('aadClientId'), variables('singlequote'), ' ', variables('singlequote'), parameters('aadClientSecret'), variables('singlequote'), ' ', variables('singlequote'), variables('resourceGroupName'), variables('singlequote'), ' ', variables('singlequote'), variables('location'), variables('singlequote'), ' ', variables('singlequote'), parameters('enableMetrics'), variables('singlequote'), ' ', variables('singlequote'), parameters('enableLogging'), variables('singlequote'), ' ', variables('singlequote'), parameters('enableAzure'), variables('singlequote'), ' ', variables('singlequote'), parameters('storageKind'), variables('singlequote'), '\" \"', parameters('etcdInstanceCount'), '\" \"', '\" \"', parameters('openshiftEtcdHostname'), '\" \"')]"
 			}
 		}
 	}],
